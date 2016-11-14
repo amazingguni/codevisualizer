@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Custom Login Form Styling with CSS3" />
+		<meta name="keywords" content="css3, login, form, custom, input, submit, button, html5, placeholder" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" href="css/hjmain.css" />
+		<link rel="stylesheet" type="text/css" href="css/style_main.css" />
+
+		<script src="http://yandex.st/raphael/2.0/raphael.min.js"></script>
+		<script src="js/modernizr.custom.63321.js"></script>
+
+		<script src="js/drawmodule.js"></script>
+		<script src="class/rowdataclass.js"></script>
+		<script src="class/fileinfoclass.js"></script>
+		<script src="class/folderinfoclass.js"></script>
+		<script src="class/rundebugclass.js"></script>
+
+		<title>CodeVisualizer-main</title>
+
+		<style type="text/css">
+			#pic {
+				width: 100%;
+				height: 100%;
+				background-color: #fff
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class ="nav logo">
+				<img id="logo" src="images/logo.png" />
+			</div>
+			<a>CodeVisualizer</a>
+
+			<div id="memberinfo-content">
+				<a id="memberIcon"></a>
+				<a id="memberid" href="#">hj</a>
+				<a id="logout" href="logout.php"> Sign Out</a>
+			</div>
+		</header>
+
+		<section>
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a class="ico-wrapper" onclick="drawCircle()">drawCircle</a>
+					<div id="divider"></div>
+					<a class="ico-wrapper" onclick="drawRect()">drawRect</a>
+					<div id="divider"></div>
+				</div>
+
+				<div>
+					<input id="inputtext" type="text" style="width: 200px; height: 30px; float: left;">
+					</input>
+					<button id="emitVar" onclick="emitVar(inputtext.value)" style="width: 80px; height: 30px;">
+						emitVar
+					</button>
+				</div>
+				<!-- Code Visualizer View-->
+				<div id="pic" wrap="soft"></div>
+			</div>
+		</section>
+
+		<!--본격 스크립트-->
+		<script>
+			var picture = document.getElementById("pic");
+			var testdbg = document.getElementById("testdbg");
+			var inputtext = document.getElementById("inputtext");
+
+			// 			그림 그릴 공간
+			var paper = createPaper(picture);
+
+			var cir = drawCircle();
+			var rect = drawRect();
+
+			paper.canvas.addEventListener("DOMMouseScroll", handleScroll, false);
+			paper.canvas.addEventListener("mousewheel", handleScroll, false);
+
+			var scale = 1.0;
+			var scaleMultiplier = 0.8;
+
+			function emitVar(text) {
+				var arr = text.split('@');
+				if (arr[0] == "circle") {
+					var anim = {
+						cx : arr[1],
+						cy : arr[2]
+					}
+					cir.animate(anim, 1000, "backOut");
+				} else if (arr[0] == "rect") {
+					var anim = {
+						x : arr[1] - 100,
+						y : arr[2] - 50
+					}
+					rect.animate(anim, 1000, "backOut");
+				}
+			}
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Custom Login Form Styling with CSS3" />
+		<meta name="keywords" content="css3, login, form, custom, input, submit, button, html5, placeholder" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" href="css/hjmain.css" />
+		<link rel="stylesheet" type="text/css" href="css/style_main.css" />
+
+		<!-- 		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.3.min.js"></script> -->
+
+		<script src="js/kinetic-v4.0.3.min.js"></script>
+		<script src="js/modernizr.custom.63321.js"></script>
+		<!-- 		<script src="js/fullmodule.js"></script> -->
+		<script src="data/data0108.js"></script>
+
+		<title>CodeVisualizer-main</title>
+
+		<style type="text/css">
+			#pic {
+				width: 100%;
+				height: 100%;
+				background-color: #fff
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class ="nav logo">
+				<img id="logo" src="images/logo.png" />
+			</div>
+			<a>CodeVisualizer</a>
+
+			<div id="memberinfo-content">
+				<a id="memberIcon"></a>
+				<a id="memberid" href="#">hj</a>
+				<a id="logout" href="logout.php"> Sign Out</a>
+			</div>
+		</header>
+
+		<section>
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a id="addVarToObject" class="ico-wrapper" onclick="addVarToObject(mainlayer)">addVarToObject</a>
+					<div id="divider"></div>
+					<a id= "testdbg" class="ico-wrapper"></a>
+					<div id="divider"></div>
+					<a id= "pagenumdbg" class="ico-wrapper"></a>
+					<div id="divider"></div>
+					<a id= "dbgcontent" class="ico-wrapper"></a>
+				</div>
+				<!-- Code Visualizer View-->
+				<div id="pic" wrap="soft"></div>
+			</div>
+		</section>
+
+		<!--본격 스크립트-->
+		<script>
+			var alldatas = getAllDataArray();
+			var frameListEOF = "->None";
+
+			var picture = document.getElementById("pic");
+			var picW = picture.offsetWidth;
+			var picH = picture.offsetHeight;
+
+			var testdbg = document.getElementById("testdbg");
+			var pagenumdbg = document.getElementById("pagenumdbg");
+			var dbgcontent = document.getElementById("dbgcontent");
+
+			//stage 생성
+			var stage = createStage(stage, picture);
+			var mainlayer = createLayer("mainlayer");
+			stage.add(mainlayer);
+
+			var objGroup = createObject();
+
+			mainlayer.add(objGroup);
+
+			var childdata = drawBaseVar("Here", "is", "object1");
+			setPosInObject(objGroup, childdata);
+
+			var objGroupH = objGroup.children[0].getHeight();
+
+			var datacount = 0;
+
+			var start = drawBaseVar("Here", "is", "Start");
+			start.setAbsolutePosition(300, 300);
+			start.setScale(1);
+
+			mainlayer.add(start);
+
+			connStartToEnd(start, objGroup);
+			objectSolution(start, objGroup);
+
+			mainlayer.draw();
+
+			//stage에 mousewheel event 추가
+			stage.getDOM().addEventListener("DOMMouseScroll", handleScroll, false);
+			stage.getDOM().addEventListener("mousewheel", handleScroll, false);
+
+			//확대축소 관련
+			var scale = 1.0;
+			var scaleMultiplier = 0.8;
+			var startDragOffset = {};
+			var mouseDown = false;
+
+			var preframelist = null;
+
+			// enter 입력에 사용
+			function addVarToObject(layer) {
+				var tmpid = "#object";
+				var stage = layer.getStage();
+				var grouparr = stage.get(tmpid);
+				var objGroup = grouparr[0];
+
+				objGroup.children[0].setHeight(objGroupH * (objGroup.get(".basicvar").length + 1));
+
+				var data = drawBaseVar("Here", "is", "object1");
+				data.setScale(1);
+				data.setAbsolutePosition(objGroup.children[0].getWidth() / 2 - data.children[0].getWidth() / 2, objGroup.children[0].getHeight() / 2 - data.children[0].getHeight() / 2 + ((data.children[0].getHeight()) * objGroup.get(".basicvar").length));
+
+				objGroup.add(data);
+				layer.draw();
+			}
+
+			function drawData(alldata) {
+
+				// var testA = ['execfile','spam','frame'];
+				// window.alert(testA.inArray('spam'));
+
+				if (datacount == alldatas.length + 1) {
+					var drawDatabtn = document.getElementById("drawData");
+					drawDatabtn.innerHTML = "Don't Click";
+					return -1;
+				}
+				var tmptostring = objectToString(alldata);
+				var tmptoobject = stringToObject(tmptostring);
+
+				var framedict = tmptoobject.FrameDict;
+				var objdict = tmptoobject.objDict;
+				var framelist = tmptoobject.FrameList;
+				var printlist = tmptoobject.printList;
+
+				var existframe = mainlayer.get(".frame");
+				var existlen = existframe.length;
+				var framelen = framelist.length;
+
+				if (existframe == null) {
+					for (var j = 0; j < framelist.length; j++) {
+						if (checkStr(framelist[j], frameListEOF)) {
+							break;
+						}
+						createFrame(framelist[j]);
+					}
+				} else {
+					for (var j = 0; j < framelist.length; j++) {
+						if (checkStr(framelist[j], frameListEOF)) {
+							break;
+						}
+
+						if (existlen > framelen) {
+							for (var k = 0; k < existframe.length; k++) {
+								var checkexistframe = framelist.inArray(existframe[k].getId());
+
+								if (checkexistframe) {
+									continue;
+								} else if (!checkexistframe) {
+									removeFromId(existframe[k].getId());
+								}
+							}
+						} else if (existlen < framelen) {
+							var checkframe = existframe.frameinArray(framelist[j]);
+
+							if (checkframe) {
+								continue;
+							} else {
+								createFrame(framelist[j]);
+							}
+						} else {
+							var checkframe = existframe.frameinArray(framelist[j]);
+							var checkexistframe = framelist.inArray(existframe[j].getId());
+
+							if (checkframe && checkexistframe) {
+								continue;
+							} else if (!checkframe) {
+								//문제가 있는듯?
+								removeFromId(existframe[j].getId());
+								createFrame(framelist[j]);
+							}
+						}
+
+					}
+				}
+				mainlayer.draw();
+
+				// framedict 내용 그리기
+				for (var childkey in framedict) {( function() {
+							var childData = framedict[childkey];
+							drawSampleDataJson(childData);
+						}());
+
+				}
+
+				testdbg.innerHTML = datacount - 1;
+				preframelist = framelist;
+				return 0;
+			}
+
+
+			Array.prototype.inArray = function(needle) {
+				for (var i = 0, len = this.length; i < len; i++) {
+					if (this[i] == needle) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			Array.prototype.frameinArray = function(needle) {
+				for (var i = 0, len = this.length; i < len; i++) {
+					if (this[i].getId() == needle) {
+						return true;
+					}
+				}
+				return false;
+			}
+			function drawSampleDataJson(datas) {
+				var dataLen = datas.length;
+
+				var tmpnum = 0;
+
+				for (var i = 3; i < dataLen; i++) {
+
+					addVarToFrame(datas[1], datas[i], datas[i + 1], (dataLen - 3) / 2);
+					// mainlayer.add(parentgr);
+					mainlayer.draw();
+
+					if (checkStr(datas[i + 1], 'instance')) {//instance가 포함되어 있다면
+						window.alert(datas[i + 1]);
+						// drawSampleDataJson(objDatas, null);
+					}
+
+					// parentgr.transitionTo({
+					// y : 0,
+					// duration : 1,
+					// easing : 'ease-out'
+					// });
+					i++;
+				}
+				mainlayer.draw();
+
+				dbgcontent.innerHTML = datas[0] + ":" + datas[1] + ":" + datas[2] + "번째 줄 <br>";
+
+				// if (objDatas == null) {
+				// return;
+				// }
+			}
+
+			function addVarToFrame(framename, datatype, datavalue, num) {
+				var tmpid = "#" + framename;
+				//frame name
+				var stage = mainlayer.getStage();
+				var grouparr = stage.get(tmpid);
+				var groupframe = grouparr[0];
+
+				var childarr = groupframe.get(".basicvar");
+				var childlen = childarr.length;
+
+				if (childlen == 0) {
+					var childgr = drawBaseVar(datatype, "", datavalue);
+					groupframe.add(setVarsPos(groupframe, childgr));
+					childgr.transitionTo({
+						scale : {
+							x : 0.7,
+							y : 0.7
+						},
+						duration : 1,
+						easing : 'elastic-ease-out'
+					});
+					mainlayer.draw();
+				}
+
+				for (var i = 0; i < childlen; i++) {
+					var targetIndex = findIndex(childlen, childarr, datatype);
+
+					if (targetIndex == -1) {
+						var childgr = drawBaseVar(datatype, "", datavalue);
+						groupframe.add(setVarsPos(groupframe, childgr));
+						childgr.transitionTo({
+							scale : {
+								x : 0.7,
+								y : 0.7
+							},
+							duration : 1,
+							easing : 'elastic-ease-out'
+						});
+						mainlayer.draw();
+						break;
+					} else {
+						var childtype = childarr[targetIndex].children[1].getText();
+						var childname = childarr[targetIndex].children[0].getText();
+
+						if (childname == "\n" + datavalue) {
+						} else {
+							if (datavalue <= 8) {
+								childarr[targetIndex].children[0].setFontSize(30);
+							}
+							childarr[targetIndex].children[0].setText("\n" + datavalue);
+							childarr[targetIndex].transitionTo({
+								scale : {
+									x : 0.7,
+									y : 0.7
+								},
+								duration : 1,
+								easing : 'elastic-ease-out'
+							});
+							mainlayer.draw();
+						}
+						break;
+					}
+				}
+				return groupframe;
+			}
+
+			function findIndex(len, childarr, datatype) {
+				while (len-- != 0) {
+					if (childarr[len].children[1].getText() == datatype) {
+						break;
+					}
+				}
+				return len;
+			}
+
+			function setVarsPos(parent, childgroup) {
+				var width = parent.children[0].getWidth();
+				var height = parent.children[0].getHeight();
+				childgroup.setDraggable(true);
+
+				childgroup.setX(parent.children[0].getX() + customRand(width * 5 / 6));
+				childgroup.setY(parent.children[0].getY() + customRand(height * 5 / 6));
+
+				return childgroup;
+			}
+
+			function setPosInObject(objGroup, childdata) {
+				childdata.setScale(1);
+				childdata.setAbsolutePosition(objGroup.children[0].getWidth() / 2 - childdata.children[0].getWidth() / 2, objGroup.children[0].getHeight() / 2 - childdata.children[0].getHeight() / 2);
+
+				objGroup.add(childdata);
+			}
+
+			function customRand(range) {
+				var a = 1664525;
+				var m = 4294967296;
+				var c = 1013904223;
+
+				var offset = 0;
+
+				var x = Math.round(Math.random() * range);
+
+				var tmp = (a * x + c) % m;
+
+				var res = tmp % range + offset;
+
+				return res;
+			}
+
+			//변수 그림 그리는 함수
+			function drawBaseVar(datatype, dataname, datavalue) {
+				// var wholegroup = new Kinetic.Group();
+
+				var r = Math.random();
+				var orivalue = "";
+				var group = new Kinetic.Group();
+				group.setDraggable(true);
+
+				orivalue = datavalue;
+
+				var tmprect = new Kinetic.Text({
+					x : 0,
+					y : 0,
+					name : orivalue,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					fill : "rgb(" + parseInt(255 * r) + ",160,200)",
+					text : "\n" + datavalue,
+					fontSize : 30,
+					fontFamily : 'Calibri',
+					textFill : 'white',
+					width : 200,
+					height : 100,
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5,
+				});
+
+				if (datavalue.length > 8) {
+					// datavalue = datavalue.substring(0, 8) + "...";
+					tmprect.setFontSize(20);
+				}
+
+				var tw = tmprect.getWidth();
+				var th = tmprect.getHeight();
+
+				var tmptype = new Kinetic.Text({
+					y : -23,
+					width : tw,
+					align : 'left',
+					text : datatype,
+					fontSize : 18,
+					textFill : 'gray',
+				});
+
+				var tmpname = new Kinetic.Text({
+					y : th + 6,
+					x : 0,
+					width : tw,
+					text : dataname,
+					align : 'right',
+					fontSize : 15,
+					textFill : 'gray',
+				});
+
+				group.add(tmprect);
+				group.add(tmptype);
+				group.add(tmpname);
+				// customRand(screen.height)
+				group.setX(0);
+				group.setY(0);
+				group.setScale(0.3);
+				group.setName("basicvar");
+
+				// wholegroup.add(group);
+
+				return group;
+			}
+
+			//확대 축소
+			function handleScroll(evt) {
+				var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
+				if (delta > 0) {
+					scale /= scaleMultiplier;
+					mainlayer.setScale(scale);
+					mainlayer.draw();
+				} else {
+					scale *= scaleMultiplier;
+					mainlayer.setScale(scale);
+					mainlayer.draw();
+				}
+				return evt.preventDefault() && false;
+			};
+
+			// 			framelist : 현재 FrameList
+			function createFrame(frameid) {
+				var tmpid = "#" + frameid;
+				var stage = mainlayer.getStage();
+				var grouparr = stage.get(tmpid);
+				var groupframe = grouparr[0];
+
+				if (groupframe == undefined || groupframe == null || groupframe == '' || groupframe == 'undefined' || groupframe == 'null') {
+					tmpgroup = createGroup(frameid);
+					tmpgroup.setName("frame");
+					var existframe = mainlayer.get(".frame");
+					var existlen = existframe.length;
+					tmpgroup.setAbsolutePosition(0, -picH * existlen);
+
+					var tmpFrameName = new Kinetic.Text({
+						x : 0,
+						y : 0,
+						width : picW,
+						height : picH,
+						fill : "#eee", //frame 구분하기 위한 색상
+						align : 'left',
+						text : frameid,
+						fontSize : 20,
+						textFill : 'gray',
+					});
+
+					tmpgroup.add(tmpFrameName);
+					tmpgroup.setDraggable(true);
+					mainlayer.add(tmpgroup);
+					prezinext();
+					return tmpgroup;
+				} else {
+					return groupframe;
+				}
+			}
+
+			function createStage(stage, canvas) {
+				var picW = canvas.offsetWidth;
+				var picH = canvas.offsetHeight - 20;
+
+				if (stage == null) {
+					var stage = new Kinetic.Stage({
+						container : canvas,
+						width : picW,
+						height : picH
+					});
+					return stage;
+				} else {
+					return stage;
+				}
+			}
+
+			function createLayer(layerid) {
+				var layer = new Kinetic.Layer();
+				layer.setId(layerid);
+				return layer;
+			}
+
+			function createGroup(groupid) {
+				var group = new Kinetic.Group();
+				group.setId(groupid);
+				return group;
+			}
+
+			//문자열에 포함되어 있는지 check
+			function checkStr(strdata, substr) {
+				var pattern = new RegExp(substr, "g");
+
+				if (pattern.exec(strdata)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			function preziprev() {
+				if (prezinum == 0) {
+					return;
+				}
+				mainlayer.transitionTo({
+					y : (picH * --prezinum),
+					scale : {
+						x : 1,
+						y : 1
+					},
+					duration : 1.2,
+					easing : 'ease-out'
+				});
+
+				mainlayer.draw();
+				pagenumdbg.innerHTML = (prezinum + 1) + "페이지";
+			}
+
+			function prezinext() {
+				if (prezinum == mainlayer.children.length - 1) {
+					return;
+				}
+				mainlayer.transitionTo({
+					y : (picH * ++prezinum),
+					scale : {
+						x : 1,
+						y : 1
+					},
+					duration : 1.2,
+					easing : 'ease-out'
+				});
+
+				mainlayer.draw();
+				pagenumdbg.innerHTML = (prezinum + 1) + "페이지";
+			}
+
+			function removeFromId(eraseid) {
+
+				var tmpid = "#" + eraseid;
+				var stage = mainlayer.getStage();
+				var erasearr = stage.get(tmpid);
+				var eraseTarget = erasearr[0];
+
+				if (eraseTarget != null) {
+					eraseTarget.remove();
+					preziprev();
+				}
+			}
+
+			function connStartToEnd(start, end) {
+				var startpointX = start.getX() + start.children[0].getWidth() / 2;
+				var startpointY = start.getY() + start.children[0].getHeight() / 2;
+				var endpointX = end.getX() + end.children[0].getWidth() / 2;
+				var endpointY = end.getY() + end.children[0].getHeight() / 2;
+
+				var connline = new Kinetic.Line({
+					points : [startpointX, startpointY, endpointX, endpointY],
+					stroke : 'red',
+					strokeWidth : 0,
+					lineCap : 'round',
+					lineJoin : 'round',
+					id : 'line'
+				});
+
+				mainlayer.add(connline);
+
+				connline.moveToBottom();
+
+				connline.transitionTo({
+					strokeWidth : 5,
+					duration : 0.5,
+					easing : 'linear'
+				});
+
+				mainlayer.draw();
+
+				return connline;
+			}
+
+			function objectSolution(start, end) {
+				start.on('dragstart', function() {
+					start.setOpacity(0.3);
+					mainlayer.get("#line")[0].remove();
+				});
+				start.on('dragend', function() {
+					start.setOpacity(1);
+					connStartToEnd(start, end);
+				});
+				end.on('dragstart', function() {
+					end.setOpacity(0.3);
+					mainlayer.get("#line")[0].remove();
+				});
+				end.on('dragend', function() {
+					end.setOpacity(1);
+					connStartToEnd(start, end);
+				});
+			}
+
+			function createObject() {
+				var r = Math.random();
+
+				var objGroup = createGroup("object");
+
+				var tmpinstance = new Kinetic.Rect({
+					x : 0,
+					y : 0,
+					width : 300,
+					height : 200,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					fill : "rgb(" + parseInt(152 + 102 * r) + ",241,219)",
+					fontFamily : 'Calibri',
+					opacity : 0.7,
+					textFill : 'white',
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5
+				});
+
+				var tw = tmpinstance.getWidth();
+				var th = tmpinstance.getHeight();
+
+				var tmpobjname = new Kinetic.Text({
+					y : -30,
+					width : tw,
+					align : 'left',
+					text : "abc",
+					fontSize : 25,
+					textFill : 'gray',
+				});
+
+				objGroup.setX(customRand(screen.width / 2));
+				objGroup.setY(customRand(screen.height / 2));
+
+				objGroup.add(tmpinstance);
+				objGroup.add(tmpobjname);
+				objGroup.setDraggable(true);
+
+				return objGroup;
+			}
+
+			// 			frameId 따라 화면에 띄우는 animation
+			// 			Object는 따로 옆에 그리기
+			//			전체 보여주는 clone 하나 생성해서 작게 보여주기
+
+		</script>
+	</body>
+</html>

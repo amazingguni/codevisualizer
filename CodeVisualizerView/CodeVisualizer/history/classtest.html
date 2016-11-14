@@ -1,0 +1,426 @@
+<!--
+드디어 같이 다님 ㅠㅠ
+-->
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0px;
+				padding: 0px;
+				width: 100%;
+				height: 100%
+			}
+		</style>
+		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.0.js"></script>
+		<script type="text/javascript" src="data/dbgdata.js"></script>
+
+		<script>
+			window.onload = function() {
+				var tmpData = {
+					frame : 'tmp',
+					type : 'string',
+					name : 'mystr',
+					value : 'asdfasdf'
+				};
+				
+				var mainData = {
+					frame : 'main',
+					type : 'int',
+					name : 'myInteger',
+					value : '30000'
+				};
+
+				var dataObj = getData();
+
+				var mainstage = new Kinetic.Stage({
+					container : "pic",
+					width : screen.width,
+					height : screen.height
+				});
+
+				var mainlayer = new Kinetic.Layer();
+
+				// mainlayer.add(drawFrame("frame1", 400, 400));
+				// mainlayer.add(drawFrame("frame2", 300, 300));
+				// mainlayer.add(drawFrame("frame3", 500, 500));
+				// mainlayer.add(drawFrame("frame4", 300, 300));
+				// mainlayer.add(drawFrame("frame5", 200, 200));
+				// mainlayer.add(drawFrame("frame6", 300, 300));
+
+				// for (var key in dataObj) {( function() {
+				// var d = dataObj[key];
+				// addVarToClass(stage, "main", d);
+				// }());
+				// }
+				mainstage.add(mainlayer);
+
+				addVarToClass(mainstage, mainlayer, mainData);
+				addVarToClass(mainstage, mainlayer, tmpData);
+				addVarToClass(mainstage, mainlayer, mainData);
+				addVarToClass(mainstage, mainlayer, tmpData);
+				addVarToClass(mainstage, mainlayer, mainData);
+				addVarToClass(mainstage, mainlayer, tmpData);
+				addVarToClass(mainstage, mainlayer, mainData);
+				addVarToClass(mainstage, mainlayer, tmpData);
+				addVarToClass(mainstage, mainlayer, tmpData);
+				addVarToClass(mainstage, mainlayer, mainData);
+				addVarToClass(mainstage, mainlayer, tmpData);
+
+				// stage.add(drawNode(stage, "class", datas));
+				// addVarToClass(stage, "main", tmpData);
+			};
+
+			function drawNode(stage, frameid, dataObj) {
+				var layer = createLayer(frameid);
+				var r = Math.random();
+
+				classgroup = new Kinetic.Group();
+				classgroup.setDraggable(true);
+
+				tmpgroup = new Kinetic.Group();
+
+				var tmpclass = new Kinetic.Text({
+					x : 0,
+					y : -50,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					fill : "rgb(" + parseInt(255 * Math.random()) + ",160,200)",
+					fontSize : 15,
+					fontFamily : 'Calibri',
+					textFill : 'white',
+					text : "\nclass",
+					width : 100,
+					height : 50,
+					// height : 50,
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5,
+				});
+
+				var tmpcw = tmpclass.getWidth();
+				var tmpch = tmpclass.getHeight();
+
+				var tmpinstance = new Kinetic.Text({
+					x : 0,
+					y : 0,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					alpha : 0.5,
+					fontFamily : 'Calibri',
+					textFill : 'white',
+					width : 500,
+					height : 500,
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5,
+				});
+
+				tmpgroup.add(tmpinstance);
+
+				var line = new Kinetic.Shape({
+					drawFunc : function(context) {
+						var fromX = 0;
+						var fromY = tmpch / 2;
+						var toX = tmpcw;
+						var toY = tmpch / 2;
+						var size = toX;
+						var arrowX = fromX + 0.9 * size;
+						var arrowTopY = fromY - 0.707 * (0.1 * size);
+						var arrowBottomY = fromY + 0.707 * (0.1 * size);
+
+						context.beginPath();
+						context.moveTo(fromX, fromY);
+						context.lineTo(toX, toY);
+						context.moveTo(fromX + size, toY);
+						context.lineTo(arrowX, arrowTopY);
+						context.closePath();
+						context.lineTo(arrowX, arrowBottomY);
+						this.fill(context);
+						this.stroke(context);
+					},
+					// fill : "#00D2FF",
+					stroke : "#948E9E",
+					strokeWidth : 3
+				});
+
+				for (var key in dataObj) {( function() {
+							var d = dataObj[key];
+							var tmp = drawClassVar(tmpgroup, tmpinstance, d.type, d.name, d.value);
+							tmpgroup.add(tmp);
+						}());
+				}
+
+				tmpgroup.setX((screen.width / 2) * r + tmpcw * 2);
+				tmpgroup.setY((screen.height / 2) * r);
+				classgroup.add(tmpgroup);
+				classgroup.add(tmpclass);
+				classgroup.add(line);
+				classgroup.setX((screen.width / 2) * r);
+				classgroup.setY((screen.height / 2) * r);
+				tmpgroup.setDraggable(true);
+				classgroup.setDraggable(true);
+
+				layer.add(classgroup);
+				layer.add(tmpgroup);
+				layer.setDraggable(true);
+
+				tmpclass.transitionTo({
+					y : 0,
+					duration : 1,
+					easing : 'ease-out'
+				});
+
+				tmpinstance.transitionTo({
+					y : 0,
+					duration : 1,
+					easing : 'ease-out'
+
+				});
+
+				line.transitionTo({
+					x : tmpcw,
+					scale : {
+						x : 1,
+						y : 1
+					},
+					// rotation: -Math.PI*2,
+					duration : 1,
+					// easing : 'elastic-ease-out'
+					// easing : 'ease-in',
+					// easing : 'ease-in-out'
+					easing : 'ease-out'
+				});
+
+				return layer;
+				// stage.add(layer);
+			}
+
+			function drawFrame(groupid, frameW, frameH) {
+				var r = Math.random();
+
+				tmpgroup = createGroup(groupid);
+
+				var tmpinstance = new Kinetic.Text({
+					x : screen.width / 4 * r,
+					y : screen.height / 4 * r,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					fill : '#eee',
+					alpha : 0.5,
+					fontFamily : 'Calibri',
+					textFill : 'white',
+					width : frameW,
+					height : frameH,
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5,
+				});
+
+				var tmpFrameName = new Kinetic.Text({
+					x : tmpinstance.getX(),
+					y : tmpinstance.getY() - 23,
+					width : tmpinstance.getWidth(),
+					align : 'left',
+					text : groupid,
+					fontSize : 18,
+					textFill : 'gray',
+				});
+				
+				tmpgroup.setX(tmpFrameName.getX());
+				tmpgroup.setY(tmpFrameName.getY());
+				
+				tmpgroup.add(tmpinstance);
+				tmpgroup.add(tmpFrameName);
+				tmpgroup.setDraggable(true);
+
+				// tmpinstance.transitionTo({
+				// y : 0,
+				// duration : 1,
+				// easing : 'ease-out'
+				//
+				// });
+
+				return tmpgroup;
+			}
+
+			function addVarToClass(stage, layer, data) {
+				var tmpid = "#" + data.frame;
+				var grouparr = stage.get(tmpid);
+				var groupframe = grouparr[0];
+				// var tmplayer = new Kinetic.Layer();
+
+				// for (var key in data) {( function() {
+				// dt = data[key];
+				// }());
+				// }
+
+
+				if (groupframe == undefined || groupframe == null || groupframe == '' || groupframe == 'undefined' || groupframe == 'null') {
+					var tmpgroup = drawFrame(data.frame, 400, 400);
+					drawClassVar(tmpgroup, 400, data.type, data.name, data.value);
+					// tmpgroup.setDraggable(true);
+					layer.add(tmpgroup);
+				} else {
+					drawClassVar(groupframe, 400, data.type, data.name, data.value);
+					// layer.draw();
+					// groupframe.add(vargroup);
+					layer.add(groupframe);
+				}
+				
+				stage.draw();
+			}
+
+			function drawBaseVar(datatype, dataname, datavalue) {
+				var wholegroup = new Kinetic.Group();
+
+				var r = Math.random();
+				var orivalue = "";
+				var group = new Kinetic.Group();
+				group.setDraggable(true);
+
+				orivalue = datavalue;
+
+				if (datavalue.length > 8) {
+					datavalue = datavalue.substring(0, 8) + "...";
+				}
+
+				var tmprect = new Kinetic.Text({
+					x : 0,
+					y : 0,
+					name : orivalue,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					fill : "rgb(" + parseInt(255 * r) + ",160,200)",
+					text : "\n" + datavalue,
+					fontSize : 30,
+					fontFamily : 'Calibri',
+					textFill : 'white',
+					width : 200,
+					height : 100,
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5,
+				});
+
+				var tw = tmprect.getWidth();
+				var th = tmprect.getHeight();
+
+				var tmptype = new Kinetic.Text({
+					y : -23,
+					width : tw,
+					align : 'left',
+					text : datatype,
+					fontSize : 18,
+					textFill : 'gray',
+				});
+
+				var tmpname = new Kinetic.Text({
+					y : th + 6,
+					x : 0,
+					width : tw,
+					text : dataname,
+					align : 'right',
+					fontSize : 15,
+					textFill : 'gray',
+				});
+
+				group.add(tmprect);
+				group.add(tmptype);
+				group.add(tmpname);
+
+				group.setX(screen.width / 2 * r);
+				group.setY(screen.height / 2 * r);
+				group.setScale(0.7);
+
+				//tool tip
+				group.on("mousemove", function() {
+					var mousePos = stage.getMousePosition();
+					tooltip.setPosition(mousePos.x + 5, mousePos.y + 5);
+					tooltip.setText(orivalue);
+					tooltip.show();
+					tooltipLayer.draw();
+				});
+
+				group.on("mouseout", function() {
+					tooltip.hide();
+					tooltipLayer.draw();
+				});
+
+				//animation 어쩌지...
+				// tmprect.transitionTo({
+				// x : 0,
+				// scale : {
+				// x : 1,
+				// y : 1
+				// },
+				// duration : 1,
+				// easing : 'ease-out'
+				// });
+
+				wholegroup.add(group);
+
+				return wholegroup;
+			}
+
+
+			function drawClassVar(parent, parentW, datatype, dataname, datavalue) {
+				var parentX = parent.getX();
+				var parentY = parent.getY();
+				
+				var r = Math.random();
+
+				var group = drawBaseVar(datatype, dataname, datavalue);
+				group.setDraggable(true);
+
+				group.setX(parentX - parentW/2 * r);
+				group.setY(parentY - parentW/2 * r);
+				group.setScale(0.5);
+
+				parent.add(group);
+				// return group;
+			}
+
+
+			function createLayer(layerid) {
+				var layer = new Kinetic.Layer();
+				layer.setId(layerid);
+				return layer;
+			}
+
+			function createGroup(groupid) {
+				var group = new Kinetic.Group();
+				group.setId(groupid);
+				return group;
+			}
+
+		</script>
+	</head>
+	<body>
+		<div id = "pic" style="width: screen.Width; height: screen.Height; background-color: #1a1a1a"></div>
+	</body>
+</html>

@@ -1,0 +1,22 @@
+{"FrameDict": {"execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "10"]}, "objDict": {}, "FrameList": ["execfile()"], "printList": []}
+s
+{"FrameDict": {"tupleset": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "tupleset", "3"], "execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "10"]}, "objDict": {}, "FrameList": ["tupleset", "execfile()"], "printList": []}
+s
+{"FrameDict": {"tupleset": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "tupleset", "4"], "execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "10"]}, "objDict": {}, "FrameList": ["tupleset", "execfile()"], "printList": []}
+s
+{"FrameDict": {"tupleset": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "tupleset", "5", "a", "[1, 2, 3, 4, 5]"], "execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "10"]}, "objDict": {}, "FrameList": ["tupleset", "execfile()"], "printList": []}
+s
+{"FrameDict": {"tupleset": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "tupleset", "6", "a", "[1, 2, 3, 4, 5]", "b", "{'g': 55, 'k': 33}"], "execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "10"]}, "objDict": {}, "FrameList": ["tupleset", "execfile()"], "printList": []}
+s
+{"FrameDict": {"tupleset": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "tupleset", "7", "a", "[1, 2, 3, 4, 5]", "c", "(3, 45)", "b", "{'g': 55, 'k': 33}"], "execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "10"]}, "objDict": {}, "FrameList": ["tupleset", "execfile()"], "printList": []}
+s
+{"FrameDict": {"tupleset": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "tupleset", "8", "a", "[1, 2, 3, 4, 5]", "c", "(3, 45)", "b", "{'g': 55, 'k': 33}", "d", "set([1, 2, 3, 4, 5])"], "execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "10"]}, "objDict": {}, "FrameList": ["tupleset", "execfile()"], "printList": []}
+s
+{"FrameDict": {"execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "11"]}, "objDict": {}, "FrameList": ["execfile()"], "printList": []}
+s
+{"FrameDict": {"execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "12", "a", "5"]}, "objDict": {}, "FrameList": ["execfile()"], "printList": []}
+s
+{"FrameDict": {"execfile()": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()", "13", "b", "6", "a", "5"]}, "objDict": {}, "FrameList": ["execfile()"], "printList": []}
+s
+{"FrameDict": {"execfile()->None": ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", "execfile()->None", "1", "b", "6", "a", "5", "c", "3"]}, "objDict": {}, "FrameList": ["exec()->None@'<string>'@1", "execfile()->None"], "printList": []}
+

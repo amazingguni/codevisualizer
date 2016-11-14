@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Custom Login Form Styling with CSS3" />
+		<meta name="keywords" content="css3, login, form, custom, input, submit, button, html5, placeholder" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" href="css/hjmain.css" />
+		<link rel="stylesheet" type="text/css" href="css/style_main.css" />
+
+		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.3.min.js"></script>
+
+		<script src="js/modernizr.custom.63321.js"></script>
+		<script src="js/mainmodule.js"></script>
+
+		<script src="data/dataobjclass.js"></script>
+		<script src="data/builtvardata.js"></script>
+
+		<script src="class/rowdataclass.js"></script>
+		<script src="class/fileinfoclass.js"></script>
+		<script src="class/folderinfoclass.js"></script>
+		<script src="class/rundebugclass.js"></script>
+
+		<title>CodeVisualizer-main</title>
+
+		<style type="text/css">
+			#pic {
+				width: 100%;
+				height: 100%;
+				background-color: #fff
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class ="nav logo">
+				<img id="logo" src="images/logo.png" />
+			</div>
+			<a>CodeVisualizer</a>
+
+			<div id="memberinfo-content">
+				<a id="memberIcon"></a>
+				<a id="memberid" href="#">hj</a>
+				<a id="logout" href="logout.php"> Sign Out</a>
+			</div>
+		</header>
+
+		<section>
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a id="drawing" class="ico-wrapper" onclick="drawing()">draw</a>
+					<div id="divider"></div>
+					<a id="test" class="ico-wrapper" onclick="test()">test</a>
+					<div id="divider"></div>
+					<a id="preziprev" class="ico-wrapper" onclick="preziprev()">Prev</a>
+					<div id="divider"></div>
+					<a id="prezinext" class="ico-wrapper" onclick="prezinext()">Next</a>
+					<div id="divider"></div>
+					<a id= "testdbg" class="ico-wrapper"></a>
+				</div>
+				<!-- Code Visualizer View-->
+				<div id="pic" wrap="soft"></div>
+			</div>
+		</section>
+
+		<!--본격 스크립트-->
+		<script>
+			var picture = document.getElementById("pic");
+			var picW = picture.offsetWidth;
+			var picH = picture.offsetHeight;
+			
+			var testdbg = document.getElementById("testdbg");
+
+			//stage 생성
+			var stage = createStage(stage, picture);
+			var mainlayer = createLayer("mainlayer");
+			stage.add(mainlayer);
+			stage.setDraggable(true);
+
+			//stage에 mousewheel event 추가
+			stage.getDOM().addEventListener("DOMMouseScroll", handleScroll, false);
+			stage.getDOM().addEventListener("mousewheel", handleScroll, false);
+			
+			var num = 0;
+			var prezinum = 0;
+
+			//확대축소 관련
+			var scale = 1.0;
+			var scaleMultiplier = 0.8;
+			var startDragOffset = {};
+			var mouseDown = false;
+
+			//animation 관련
+			var translatePos = {
+				x : stage.getWidth() / 2,
+				y : stage.getHeight() / 2
+			};
+
+			var cX = stage.getWidth() / 2;
+			var cY = stage.getHeight() / 2;
+		</script>
+	</body>
+</html>

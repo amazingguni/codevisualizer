@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Custom Login Form Styling with CSS3" />
+		<meta name="keywords" content="css3, login, form, custom, input, submit, button, html5, placeholder" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" href="css/hjmain.css" />
+		<link rel="stylesheet" type="text/css" href="css/style_main.css" />
+
+		<script src="js/kinetic-v4.0.3.min.js"></script>
+
+		<!-- 		<script src="js/fullmodule.js"></script> -->
+		<script src="js/covimodule.js"></script>
+		<script src="js/modernizr.custom.63321.js"></script>
+		<!-- 		<script src="data/data0113.js"></script> -->
+		<script src="data/datalinkedlist.js"></script>
+<!-- 		<script src="data/datatree.js"></script> -->
+
+		<title>CodeVisualizer-main</title>
+
+		<style type="text/css">
+			#pic {
+				width: 100%;
+				height: 100%;
+				background-color: #fff
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class ="nav logo">
+				<img id="logo" src="images/logo.png" />
+			</div>
+			<a>CodeVisualizer</a>
+
+			<div id="memberinfo-content">
+				<a id="memberIcon"></a>
+				<a id="memberid" href="#">hj</a>
+				<a id="logout" href="logout.php"> Sign Out</a>
+			</div>
+		</header>
+
+		<section>
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a id="drawData" class="ico-wrapper" onclick="drawData(alldatas[datacount++])">STEP</a>
+					<div id="divider"></div>
+					<a id="preziprev" class="ico-wrapper" onclick="preziprev()">preziprev</a>
+					<div id="divider"></div>
+					<a id="prezinext" class="ico-wrapper" onclick="prezinext()">prezinext</a>
+					<div id="divider"></div>
+					<a id="drawtest" class="ico-wrapper" onclick="drawtest()">drawtest</a>
+					<div id="divider"></div>
+					<a id="testLine" class="ico-wrapper" onclick="testLine()">testLine</a>
+					<div id="divider"></div>
+					<a id= "testdbg" class="ico-wrapper"></a>
+					<div id="divider"></div>
+					<a id= "pagenumdbg" class="ico-wrapper"></a>
+					<div id="divider"></div>
+					<a id= "dbgcontent" class="ico-wrapper"></a>
+				</div>
+				<p id= "output_content"></p>
+				<!-- Code Visualizer View-->
+				<div id="pic" wrap="soft"></div>
+			</div>
+		</section>
+
+		<script>
+			var alldatas = getAllDataArray();
+			var frameListEOF = "->None";
+
+			var picture = document.getElementById("pic");
+			var picW = picture.offsetWidth;
+			var picH = picture.offsetHeight;
+
+			var testdbg = document.getElementById("testdbg");
+			var pagenumdbg = document.getElementById("pagenumdbg");
+			var dbgcontent = document.getElementById("dbgcontent");
+			var output_content = document.getElementById("output_content");
+
+			//stage 생성
+			var stage = createStage(stage, picture);
+			var mainlayer = createLayer("mainlayer");
+			stage.add(mainlayer);
+			stage.setDraggable(true);
+
+			var datacount = 0;
+
+			//stage에 mousewheel event 추가
+			stage.getDOM().addEventListener("DOMMouseScroll", handleScroll, false);
+			stage.getDOM().addEventListener("mousewheel", handleScroll, false);
+
+			var prezinum = 0;
+
+			//확대축소 관련
+			var scale = 1.0;
+			var scaleMultiplier = 0.8;
+			var startDragOffset = {};
+			var mouseDown = false;
+
+			var preframelist = null;
+		</script>
+	</body>
+</html>

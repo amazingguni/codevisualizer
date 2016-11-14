@@ -1,0 +1,13 @@
+FrameDict : 
+{'A/0x9daac8c': ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", '17'], 
+'execfile()': ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", '24', 'b', '6', 'a', '5', 'c', '3'], 
+'spam': ["'/home/junbum/workspace/CodeVisualizerDebugger/src/ExampleCode/Python/bdb-example-1.py'", '10', 'a', '3', 'c', '6', 'b', '4', 'd', '<__main__.A instance at 0x9daac8c>']}
+
+objDict
+{'9daac8c\x1aA': "{'a': 10, 'c': 3, 'b': 3, 'd': None}"}
+
+FrameList : 
+['spam', 'execfile()']
+
+printList
+[]

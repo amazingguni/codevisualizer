@@ -1,0 +1,200 @@
+#userinfo{
+	float:right;
+}
+
+#content_output{
+	width:100%;
+	height:200px;
+	background-color:#000000;
+	color : #05E300;
+	overflow: auto;
+	padding : 10px
+}
+
+#logo{
+	width:156px;
+	height:40px;
+	background:url(../images/covifinal.png) no-repeat;
+	float:left
+}
+
+#input_console{
+	width: 100%;
+	height:auto;
+}
+
+#sourceview{
+	width:100%;
+	height:100%;
+	
+}
+
+#source_on_canvas{
+	position:absolute; 
+	right:5px;
+	top:5px;
+	background-color: white;
+	-webkit-box-shadow: none;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+	font: gray;
+	font-size: 7pt;
+	padding : 10px;
+	overflow: hidden;
+	height: 150px
+	
+}
+
+.ace_editor{
+	padding:0px !important;
+	margin:2px !important;
+}
+
+.input_code {
+	width: 100%;
+	height: 100%;
+}
+
+#picture {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.ui-layout-pane{
+	padding:5px !important;
+	overflow:hidden !important;
+}
+
+
+
+#sourceview {}
+#sourceview li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
+
+/*
+#logo {
+	width: 100%;
+	height: auto;
+	padding-left: 50%;
+}
+
+#logo img {
+	width: 30px;
+	height: 30px;
+	margin: 5px;
+}
+
+#cv_userinfo{
+	position:absolute;
+	top:8px;
+	right:100px;
+}
+
+#contents {
+	width: 100%;
+	height: 100%;
+	background-color: #B81900;
+	
+	position: relative;
+}
+
+#cv_left{
+	position:relative;
+	float:left;
+	width: 13%;
+	height: 80%;
+}
+
+#cv_left #nav_toolbar {
+	position:absolute;
+	width:100%;
+	height: 100%;
+	background-color: #ffffff;
+}
+
+#cv_left #nav_toolbar #nav_buttons{
+	
+}
+
+#cv_left #nav_contents {
+	width:100%;
+	top:45px;
+	bottom:0;
+	position: absolute;
+	
+	background-color: #333333;
+}
+
+#cv_left #filetree{
+	width: 100%;
+	height:100%;
+	background-color: #DDDDDD;
+}
+
+#cv_sourceview{
+	position:relative;
+	float:left;
+	width:37%;
+	height:80%;
+	background-color:#444444;
+}
+
+#cv_sourceview #source_tab {
+	position:absolute;
+	width:100%;
+	height: 45px;
+	background-color: #333333;
+	display:block;
+}
+
+#cv_sourceview #source_contents{
+	width: 100%;
+	top: 45px;
+	bottom:0;
+	position: apsolute;
+	background-color: #666666;
+	
+}
+
+#cv_drawview{
+	position: relative;
+	float:left;
+	width:50%;
+	
+	height: 80%;
+	background-color: #888888;
+	
+}
+
+#cv_drawview #debug_toolbar{
+	position:absolute;
+	width:100%;
+	height: 45px;
+	background-color: #999999;
+	
+}
+
+#cv_drawview #debug_canvas{
+	width: 100%;
+	top: 45px;
+	bottom:0;
+	position: absolute;
+	background-color: #666666;
+}
+
+
+
+#cv_bottom {
+	
+	position:absolute;
+	width: 100%;
+	height: 20%;
+	bottom:0;
+	
+	background-color: #000000;
+	
+}
+
+
+
+*/

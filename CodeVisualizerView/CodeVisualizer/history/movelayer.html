@@ -1,0 +1,107 @@
+<!--
+fill : "rgb(" + parseInt(255 * r) + ",160,200)",
+파스텔톤
+-->
+
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0px;
+				padding: 0px;
+				width: 100%;
+				height: 100%
+			}
+		</style>
+		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.0.js"></script>
+		<script type="text/javascript" src="data/dbgdata.js"></script>
+
+		<script>
+			window.onload = function() {
+				var datas = getData();
+
+				var stage = new Kinetic.Stage({
+					container : "pic",
+					width : screen.width,
+					height : screen.height
+				});
+
+				var layer = createLayer("base");
+
+				var groupA = new Kinetic.Group();
+				var groupB = new Kinetic.Group();
+				var groupC = new Kinetic.Group();
+
+				groupA.setX(100);
+				groupA.setY(100);
+				groupB.setX(200);
+				groupB.setY(200);
+				groupC.setX(300);
+				groupC.setY(300);
+
+				groupA.setDraggable(true);
+				groupB.setDraggable(true);
+				groupC.setDraggable(true);
+
+				var box = new Kinetic.Rect({
+					x : 10,
+					y : 10,
+					width : 50,
+					height : 50,
+					fill : 'red'
+				});
+
+				var greenCircle = new Kinetic.Circle({
+					x : 0,
+					y : 0,
+					radius : 50,
+					fill : 'green'
+				});
+
+				var yellowCircle = new Kinetic.Circle({
+					x : 0,
+					y : 0,
+					radius : 50,
+					fill : 'yellow'
+				});
+
+				var blueCircle = new Kinetic.Circle({
+					x : 0,
+					y : 0,
+					radius : 50,
+					fill : 'blue'
+				});
+
+				groupA.add(greenCircle);
+				groupB.add(yellowCircle);
+				groupC.add(groupB);
+
+				layer.add(groupA);
+				layer.add(groupB);
+				layer.add(groupC);
+
+				stage.add(layer);
+
+				document.getElementById('btn').addEventListener('click', function() {
+					blueCircle.moveTo(groupB);
+					layer.draw();
+				}, false);
+
+			};
+
+			function createLayer(layerid) {
+				var layer = new Kinetic.Layer();
+				layer.setId(layerid);
+				return layer;
+			}
+
+		</script>
+	</head>
+	<body>
+		<div id = "pic" style="width: screen.Width; height: screen.Height; background-color: #1a1a1a"></div>
+		<button id="btn">
+			btn
+		</button>
+	</body>
+</html>

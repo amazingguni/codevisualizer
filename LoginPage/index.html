@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+  <title>HTML 5를 이용한 Code Visualizer</title>
+  </head>  
+  <body>
+    <!-- 아시다시피 여기서부터 Body Contents 가 들어가겠죠? -->
+    <ul>
+    <p>안녕하써리? HTML 5를 이용한 Code Visualizer</p>
+    </ul>
+    <p>
+  <label for="username">E-mail address:</label>
+  <input id="username" type=email required name=un>
+ <p>
+  <label for="password1">Password:</label>
+  <input id="password1" type=password required name=up>
+ <p>
+  <label for="password2">Confirm password:</label>
+  <input id="password2" type=password onforminput="setCustomValidity(value != password1.value ? 'Passwords do not match.' : '')">
+ <p>
+    <button type=button
+        onclick="alert('Enter the Python World!')">
+ 		Enter ID/PW
+	</button>
+    </ul>
+    <ul>
+    <!--true 값은 생략가능-->
+    <iframe src="about:blank" width="300" height="300" onload="this.contentDocument.designMode='on'">
+    <div id="editor" contenteditable="true"> 
+    <div>편집 가능</div> 
+    </iframe>
+    </ul>
+    <ul>
+    <button type=button
+        onclick="alert('Enter the Python Code!')">
+ 		Enter Python Code
+	 </button>
+    </ul>
+  </body>
+</html>

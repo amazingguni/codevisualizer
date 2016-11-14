@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0px;
+				padding: 0px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="container"></div>
+		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.5.js"></script>
+		<script>
+			function addNode(obj, layer) {
+				var node = new Kinetic.Circle({
+					x : obj.x,
+					y : obj.y,
+					radius : 4,
+					fill : obj.color,
+					id : obj.id
+				});
+
+				layer.add(node);
+			}
+
+			var stage = new Kinetic.Stage({
+				container : 'container',
+				width : 578,
+				height : 260
+			});
+
+			var topLayer = new Kinetic.Layer();
+			var tooltipLayer = new Kinetic.Layer();
+			var tooltip = new Kinetic.Text({
+				text : '',
+				fontFamily : 'Calibri',
+				fontSize : 12,
+				padding : 5,
+				fill : 'black',
+				opacity : 0.75,
+				textFill : 'white',
+				visible : false
+			});
+			tooltipLayer.add(tooltip);
+			// build data
+			var data = [];
+			var width = stage.getWidth();
+			var height = stage.getHeight();
+			var colors = ['red', 'orange', 'cyan', 'green', 'blue', 'purple'];
+			for (var n = 0; n < 20000; n++) {
+				var x = Math.random() * width;
+				var y = height + (Math.random() * 200) - 100 + (height / width) * -1 * x;
+				data.push({
+					x : x,
+					y : y,
+					id : n,
+					color : colors[Math.round(Math.random() * 5)]
+				});
+			}
+			// render data
+			var nodeCount = 0;
+			var layer = new Kinetic.Layer();
+			for (var n = 0; n < data.length; n++) {
+				addNode(data[n], layer);
+				nodeCount++;
+				if (nodeCount >= 1000) {
+					nodeCount = 0;
+					stage.add(layer);
+					layer = new Kinetic.Layer();
+				}
+			}
+			stage.add(layer);
+			stage.add(topLayer);
+			stage.add(tooltipLayer);
+
+			// move node to top layer for fast drag and drop
+			stage.on('mousedown', function(evt) {
+				var node = evt.shape;
+				node.moveTo(topLayer);
+				node.setDraggable(true);
+				// manually initialize drag and drop
+				node._initDrag();
+				layer.draw();
+			});
+			// return node to original layer
+			stage.on('mouseup', function(evt) {
+				var node = evt.shape;
+				node.moveTo(layer);
+				node.setDraggable(false);
+			});
+
+			stage.on('mouseover mousemove dragmove', function(evt) {
+				var node = evt.shape;
+				// update tooltip
+				var mousePos = node.getStage().getMousePosition();
+				tooltip.setPosition(mousePos.x + 5, mousePos.y + 5);
+				tooltip.setText("node: " + node.getId() + ", color: " + node.getFill());
+				tooltip.show();
+				tooltipLayer.draw();
+			});
+
+			stage.on('mouseout', function(evt) {
+				tooltip.hide();
+				tooltipLayer.draw();
+			});
+
+		</script>
+	</body>
+</html>

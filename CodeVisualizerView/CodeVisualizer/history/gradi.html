@@ -1,0 +1,208 @@
+<!--
+드디어 같이 다님 ㅠㅠ
+-->
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+			body {
+				margin: 0px;
+				padding: 0px;
+				width: 100%;
+				height: 100%
+			}
+		</style>
+		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.0.js"></script>
+		<script type="text/javascript" src="data/dbgdata.js"></script>
+
+		<script>
+			window.onload = function() {
+				var canvas = document.getElementById("pic");
+
+				var screenW = canvas.offsetWidth;
+				var screenH = canvas.offsetHeight;
+
+				var screencX = screenW / 2;
+				var screencY = screenH / 2;
+
+				var stage = new Kinetic.Stage({
+					container : "pic",
+					width : screen.width,
+					height : screen.height,
+				});
+
+				var stagedbg = document.getElementById("stagedbg");
+				var nodedbg = document.getElementById("nodedbg");
+
+				var layer = new Kinetic.Layer();
+
+				for (var i = 0; i < 10; i++) {
+					layer.add(drawFrame("frame" + i, 100, 100));
+				}
+
+				stage.add(layer);
+
+				var prestageX;
+				var prestageY;
+
+				// stage.on('click', function(evt) {
+					// var tmp = evt.shape;
+					// // update tooltip
+					// tmp = tmp.getParent();
+					// nodedbg.innerHTML = "node : (" + tmp.getX() + " , " + tmp.getY() + ")";
+// 
+					// var curX = stage.getX();
+					// var curY = stage.getY();
+// 
+					// var tmpX = tmp.getX();
+					// var tmpY = tmp.getY();
+// 
+					// var resultX = prestageX - tmpX / 2;
+					// var resultY = prestageY - tmpY / 2;
+// 
+					// var curstageX = stage.getX();
+					// var curstageY = stage.getY();
+// 
+					// stage.transitionTo({
+						// x : tmpX,
+						// y : tmpY,
+						// scale : {
+							// x : 1,
+							// y : 1
+						// },
+						// duration : 1,
+						// opacity : 1,
+						// easing : 'ease-out',
+						// // callback : function() {
+						// // stage.setPosition(stage.getCenter().x, stage.getCenter().y);
+						// // }
+					// });
+// 
+					// layer.draw();
+					// stagedbg.innerHTML = "stage : (" + tmp.getStage().getSize().gap + ")";
+// 
+					// prestageX = curstageX;
+					// prestageY = curstageY;
+				// });
+
+				layer.on('click', function(ev) {
+					var d = document.getElementById('pic');
+					var cnvsPos = getPos(d);
+
+					var R = {//(canvas space)
+						x : ev.pageX,
+						y : ev.pageY
+					};
+
+					var off0 = this.getPosition();
+					var w = stage.getWidth();
+					var h = stage.getHeight();
+
+					//desired zoom point (e.g. mouse position, canvas center)
+					var zP = {
+						//use these first two lines to center the image on the clicked point while zooming
+						x : w / 2,
+						y : h / 2
+						//use these next two lines to zoom the image around the clicked point
+						// x : R.x - cnvsPos.x,
+						// y : R.y - cnvsPos.y
+					}
+
+					//actual pixel value clicked (image space)
+					var xA = {
+						x : (R.x - off0.x - cnvsPos.x),
+						y : (R.y - off0.y - cnvsPos.y)
+					}
+
+					//rescale image
+					//move clicked pixel to the desired zoom point
+					var newR = {
+						x : zP.x - 1 * xA.x,
+						y : zP.y - 1 * xA.y
+					}
+
+					this.setPosition(newR.x, newR.y);
+
+					this.draw();
+
+				});
+			};
+
+			function drawFrame(groupid, frameW, frameH) {
+				var r = Math.random();
+
+				tmpgroup = createGroup(groupid);
+
+				var tmpinstance = new Kinetic.Text({
+					x : screen.width / 4 * r,
+					y : screen.height / 4 * r,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					fill : '#eee',
+					alpha : 0.5,
+					fontFamily : 'Calibri',
+					textFill : 'white',
+					width : frameW,
+					height : frameH,
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5,
+				});
+
+				var tmpFrameName = new Kinetic.Text({
+					x : tmpinstance.getX(),
+					y : tmpinstance.getY() - 23,
+					width : tmpinstance.getWidth(),
+					align : 'left',
+					text : groupid,
+					fontSize : 18,
+					textFill : 'gray',
+				});
+
+				tmpgroup.setX(tmpFrameName.getX());
+				tmpgroup.setY(tmpFrameName.getY());
+
+				tmpgroup.add(tmpinstance);
+				tmpgroup.add(tmpFrameName);
+				tmpgroup.setDraggable(true);
+
+				return tmpgroup;
+			}
+
+			function createGroup(groupid) {
+				var group = new Kinetic.Group();
+				group.setId(groupid);
+				return group;
+			}
+
+			function getPos(obj) {
+				for (var lx = 0, ly = 0; obj != null; lx += obj.offsetLeft, ly += obj.offsetTop, obj = obj.offsetParent);
+				return {
+					x : lx,
+					y : ly
+				};
+			}
+
+		</script>
+	</head>
+	<body>
+		<p id="stagedbg"></p>
+		<p id="nodedbg"></p>
+		<div id = "pic" style="width: screen.Width; height: screen.Height; background-color: #1a1a1a"></div>
+	</body>
+</html>
+
+<!-- translateToCenter: function(ps) {
+var size = this.getSize(),
+width = ps? (size.width - ps.width - this.translateOffsetX*2) : size.width;
+height = ps? (size.height - ps.height - this.translateOffsetY*2) : size.height;
+var ctx = this.getCtx();
+ps && ctx.scale(1/this.scaleOffsetX, 1/this.scaleOffsetY);
+ctx.translate(width/2, height/2);
+} -->

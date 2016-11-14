@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Custom Login Form Styling with CSS3" />
+		<meta name="keywords" content="css3, login, form, custom, input, submit, button, html5, placeholder" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" href="css/hjmain.css" />
+		<link rel="stylesheet" type="text/css" href="css/style_main.css" />
+
+		<script src="http://yandex.st/raphael/2.0/raphael.min.js"></script>
+		<script src="js/modernizr.custom.63321.js"></script>
+
+		<script src="js/drawmodule.js"></script>
+
+		<title>CodeVisualizer-main</title>
+
+		<style type="text/css">
+			#pic {
+				width: 100%;
+				height: 100%;
+				background-color: #fff
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class ="nav logo">
+				<img id="logo" src="images/logo.png" />
+			</div>
+			<a>CodeVisualizer</a>
+
+			<div id="memberinfo-content">
+				<a id="memberIcon"></a>
+				<a id="memberid" href="#">hj</a>
+				<a id="logout" href="logout.php"> Sign Out</a>
+			</div>
+		</header>
+
+		<section>
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a class="ico-wrapper" onclick="drawCircle()">drawCircle</a>
+					<div id="divider"></div>
+					<a class="ico-wrapper" onclick="drawRect()">drawRect</a>
+					<div id="divider"></div>
+					<a class="ico-wrapper" onclick="eraseAnimate(group)">eraseAnimate</a>
+					<div id="divider"></div>
+					<a class="ico-wrapper" onclick="drawing(layer)">drawing</a>
+					<div id="divider"></div>
+					<a class="ico-wrapper" onclick="preziprev(layer)">preziprev</a>
+					<div id="divider"></div>
+					<a class="ico-wrapper" onclick="prezinext(layer)">prezinext</a>
+					<div id="divider"></div>
+					<a id= "testdbg" class="ico-wrapper"></a>
+				</div>
+
+				<div>
+					<input id="inputtext" type="text" style="width: 200px; height: 30px; float: left;">
+					</input>
+					<button id="emitVar" onclick="emitVar(inputtext.value)" style="width: 80px; height: 30px;">
+						emitVar
+					</button>
+				</div>
+				<!-- Code Visualizer View-->
+				<div id="pic" wrap="soft"></div>
+			</div>
+		</section>
+
+		<!--본격 스크립트-->
+		<script>
+			var picture = document.getElementById("pic");
+			var testdbg = document.getElementById("testdbg");
+			var inputtext = document.getElementById("inputtext");
+
+			// 			그림 그릴 공간
+			var paper = createPaper(picture);
+
+			var num = 0;
+			var prezinum = 0;
+			var framenum = 5;
+			
+			var layer = paper.set();
+
+			// var layer = new Array();
+			// var prelayer = null;
+			// var tmpY;
+
+			var r = Math.random();
+
+			// for (var i = 0; i < framenum; i++) {
+			// layer[i] = paper.setViewBox(0, 0, screen.width, screen.height);
+			// drawing(layer[i]);
+			// }
+			// for (var i = 0; i < framenum; i++) {
+			// if (prelayer == null) {
+			// tmpY = 0;
+			// } else {
+			// tmpY = prelayer.attrs.y - picture.offsetHeight;
+			// }
+			//
+			// layer[i] = paper.set();
+			//
+			// layer[i].attr({
+			// x : 0,
+			// y : tmpY
+			// });
+			//
+			// prelayer = layer[i];
+			// }
+
+			// for (var i = 0; i < framenum; i++) {
+			// layer[i] = paper.setViewBox(0, - (picture.offsetHeight * i), picture.offsetWidth, picture.offsetHeight);
+			//
+			// prelayer = layer[i];
+			// }
+
+			// for (var i = 0; i < framenum; i++) {
+				// layer[i] = paper.set();
+				// // layer[i] = paper.setViewBox(0, 0, screen.width, screen.height);
+				// // drawing(layer[i]);
+			// }
+
+			function drawing(layer) {
+				var tmp = drawRect(picture.offsetWidth / 2 - 100, picture.offsetHeight / 2 - 50 - (picture.offsetHeight * num++));
+
+				layer.push(tmp);
+			}
+
+			function preziprev(layer) {
+
+				layer.animate({
+					y : screen.height * --prezinum,
+				}, 500);
+
+				testdbg.innerHTML = prezinum + "페이지";
+			}
+
+			function prezinext(layer) {
+				// layer.transform(0, screen.height * ++prezinum);
+
+				layer.animate({
+					y : screen.height * ++prezinum,
+				}, 500);
+
+				testdbg.innerHTML = prezinum + "페이지";
+			}
+
+			// zoomin out
+			paper.setViewBox(0, 0, paper.width, paper.height);
+
+			var viewBoxWidth = paper.width;
+			var viewBoxHeight = paper.height;
+			var startX, startY;
+			var dX, dY;
+			var oX = 0, oY = 0, oWidth = viewBoxWidth, oHeight = viewBoxHeight;
+			var viewBox = paper.setViewBox(oX, oY, viewBoxWidth, viewBoxHeight);
+			viewBox.X = oX;
+			viewBox.Y = oY;
+
+			// group
+			var group = paper.set();
+			var child1 = drawCircle().attr("cx", screen.width / 2);
+			var child2 = drawCircle().attr("cx", screen.width / 2 - 100);
+			group.push(child1, child2);
+			group.attr({
+				"fill-opacity" : 0.6,
+				// cursor : "move"
+			});
+
+			if (parent.window.addEventListener)
+				parent.window.addEventListener('DOMMouseScroll', wheel, false);
+
+			parent.window.onmousewheel = parent.document.onmousewheel = wheel;
+
+		</script>
+	</body>
+</html>

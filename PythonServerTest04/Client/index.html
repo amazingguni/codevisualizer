@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>WebSockets - Simple Editor</title>
+ 	
+        <style>
+        * { font-family:tahoma; font-size:12px; padding:0px; margin:0px; }
+        p { line-height:18px; }
+        div { width:500px; margin-left:auto; margin-right:auto;}
+        
+        #status_userName { width:88px; display:block; float:left; margin-top:15px; }
+        #input_userName { border-radius:2px; border:1px solid #ccc;
+                 margin-top:10px; padding:5px; width:400px; }
+        #status_fileName { width:88px; display:block; float:left; margin-top:15px; }
+        #input_fileName { border-radius:2px; border:1px solid #ccc;
+                 margin-top:10px; padding:5px; width:400px; }
+        #content_output { padding:5px; background:#ddd; border-radius:5px;
+                   border:1px solid #CCC; margin-top:10px; }
+        #status_code { width:88px; display:block; float:left; margin-top:15px; }
+        #input_code { border-radius:2px; border:1px solid #ccc;
+                 margin-top:10px; padding:5px; width:400px; height:200px; }
+        #input_console { border-radius:2px; border:1px solid #ccc;
+                 margin-top:10px; padding:5px; width:500px; height:100px; }
+        #sendCode {width:50px}
+        #makeFile {width:100px}
+        #loadFile {width:100px}
+        #reName {width:100px}
+        #makeFolder {width:100px}
+        #debugRun {width:80px}
+        #compileRun {width:80px}
+        #exit {width:80px}
+        </style>
+    </head>
+    <body>
+        <div id="content_output"></div>
+        <div>
+        	  <span id="status_userName">User Name</span>
+        	  <input type="text" id="input_userName" disabled="disabled" />
+        	  <span id="status_fileName">Connecting...</span>
+            <input type="text" id="input_fileName" disabled="disabled" />
+            <span id="status_code">Connecting...</span>
+            <textarea name="input_code_name" id="input_code" cols="54" rows="5" wrap="hard"/> </textarea>
+            <input type="text" id="input_console" disabled="disabled" />
+            <button id="sendCode">Send</button>
+            <button id="makeFile">Make File</button>
+            <button id="loadFile">Load File</button>
+            <button id="reName">Rename</button>
+            <button id="makeFolder">Make Folder</button>
+            <button id="debugRun">Debug</button>
+            <button id="compileRun">Compile</button>
+            <button id="exit">Exit</button>
+        </div>
+ 
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+        <script src="websocket.js"></script>
+    </body>
+</html>

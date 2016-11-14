@@ -1,0 +1,53 @@
+@import url('demo.css');
+@import url('font-awesome.css');
+
+*,
+*:after,
+*:before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+.clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/*헤더 정의*/
+
+header{
+	height: 40px;
+	background-color:#444444;
+    background: -moz-linear-gradient(#444444, #000000);
+    background: -ms-linear-gradient(#444444, #000000);
+    background: -o-linear-gradient(#444444, #000000);
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(#444444), to(#000000));
+    background: -webkit-linear-gradient(#444444, #000000);
+    background: linear-gradient(#444444, #000000);
+	border-bottom: 1px solid #ffffff;
+	box-shadow: 0 -3px 3px rgba(0,0,0,0.5) inset;
+	padding: 8px 10%;
+	clear:both;
+}
+
+.nav.logo{
+	float:left;
+	padding: 0, 10%;
+}
+
+.nav.logo #logo{
+	width: 30px;
+	height: 30px;
+}
+
+#memberinfo-content{
+	float:right;
+	padding:0, 10%;
+	
+}

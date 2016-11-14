@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Custom Login Form Styling with CSS3" />
+		<meta name="keywords" content="css3, login, form, custom, input, submit, button, html5, placeholder" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" href="css/hjmain.css" />
+		<link rel="stylesheet" type="text/css" href="css/style_main.css" />
+
+		<script src="js/kinetic-v4.0.3.min.js"></script>
+
+		<script src="js/modernizr.custom.63321.js"></script>
+		<script src="js/mainmodule.js"></script>
+		<title>CodeVisualizer-main</title>
+
+		<style type="text/css">
+			#pic {
+				width: 100%;
+				height: 100%;
+				background-color: #fff
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class ="nav logo">
+				<img id="logo" src="images/logo.png" />
+			</div>
+			<a>CodeVisualizer</a>
+
+			<div id="memberinfo-content">
+				<a id="memberIcon"></a>
+				<a id="memberid" href="#">hj</a>
+				<a id="logout" href="logout.php"> Sign Out</a>
+			</div>
+		</header>
+
+		<section>
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a id="createVar" class="ico-wrapper" onclick="createVar()">createVar</a>
+					<div id="divider"></div>
+					<a id="test" class="ico-wrapper" onclick="test()">test</a>
+					<div id="divider"></div>
+					<a id="preziprev" class="ico-wrapper" onclick="preziprev()">Prev</a>
+					<div id="divider"></div>
+					<a id="prezinext" class="ico-wrapper" onclick="prezinext()">Next</a>
+					<div id="divider"></div>
+					<a id= "testdbg" class="ico-wrapper"></a>
+				</div>
+				<div>
+					<input id="inputtext" type="text" style="width: 200px; height: 30px; float: left;">
+					</input>
+					<button id="emitVar" onclick="emitVar(inputtext.value)" style="width: 80px; height: 30px;">
+						emitVar
+					</button>
+					<button id="deleteVar" onclick="deleteVar()" style="width: 80px; height: 30px;">
+						deleteVar
+					</button>
+					<button id="connNode" onclick="connNode()" style="width: 80px; height: 30px;">
+						connNode
+					</button>
+				</div>
+				<!-- Code Visualizer View-->
+				<div id="pic" wrap="soft"></div>
+			</div>
+		</section>
+
+		<!--본격 스크립트-->
+		<script>
+			var picture = document.getElementById("pic");
+			var picW = picture.offsetWidth;
+			var picH = picture.offsetHeight;
+
+			var testdbg = document.getElementById("testdbg");
+			var inputtext = document.getElementById("inputtext");
+			var emit = document.getElementById("emit");
+
+			//stage 생성
+			var stage = createStage(stage, picture);
+			var mainlayer = createLayer("mainlayer");
+			stage.add(mainlayer);
+			stage.setDraggable(true);
+
+			//stage에 mousewheel event 추가
+			stage.getDOM().addEventListener("DOMMouseScroll", handleScroll, false);
+			stage.getDOM().addEventListener("mousewheel", handleScroll, false);
+
+			var num = 0;
+			var prezinum = 0;
+
+			//확대축소 관련
+			var scale = 1.0;
+			var scaleMultiplier = 0.8;
+			var startDragOffset = {};
+			var mouseDown = false;
+
+			//animation 관련
+			var translatePos = {
+				x : stage.getWidth() / 2,
+				y : stage.getHeight() / 2
+			};
+
+			var cX = stage.getWidth() / 2;
+			var cY = stage.getHeight() / 2;
+
+			var tmp = drawBaseVartest("test", "", "12345");
+			var tmpW = tmp.children[0].getWidth();
+			var tmpH = tmp.children[0].getHeight();
+
+			//center값
+			tmp.setScale(3);
+			tmp.setAbsolutePosition(screen.width / 2 - (tmpW / 2 * tmp.getScale().x) + (screen.width * num++), screen.height / 2 - ((tmpH / 2 + 20) * tmp.getScale().x));
+
+			mainlayer.add(tmp);
+
+			var tmp2 = drawBaseVartest("test2", "", "12345");
+			var tmpW2 = tmp2.children[0].getWidth();
+			var tmpH2 = tmp2.children[0].getHeight();
+
+			//center값
+			tmp2.setScale(3);
+			tmp2.setAbsolutePosition(screen.width / 2 - (tmpW2 / 2 * tmp2.getScale().x) + (screen.width * num++), screen.height / 2 - ((tmpH2 / 2 + 20) * tmp2.getScale().x));
+
+			mainlayer.add(tmp2);
+			mainlayer.draw();
+
+			function drawBaseVartest(datatype, dataname, datavalue) {
+				// var wholegroup = new Kinetic.Group();
+
+				var r = Math.random();
+				var orivalue = "";
+				var group = new Kinetic.Group();
+				group.setDraggable(true);
+
+				orivalue = datavalue;
+
+				if (datavalue.length > 8) {
+					datavalue = datavalue.substring(0, 8) + "...";
+				}
+
+				var tmprect = new Kinetic.Text({
+					x : 0,
+					y : 0,
+					name : orivalue,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					fill : "rgb(" + parseInt(255 * r) + ",160,200)",
+					text : "\n" + datavalue,
+					fontSize : 30,
+					fontFamily : 'Calibri',
+					textFill : 'white',
+					width : 200,
+					height : 100,
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5,
+				});
+
+				var tw = tmprect.getWidth();
+				var th = tmprect.getHeight();
+
+				var tmptype = new Kinetic.Text({
+					y : -23,
+					width : tw,
+					align : 'left',
+					text : datatype,
+					fontSize : 18,
+					textFill : 'gray',
+				});
+
+				var tmpname = new Kinetic.Text({
+					y : th + 6,
+					x : 0,
+					width : tw,
+					text : dataname,
+					align : 'right',
+					fontSize : 15,
+					textFill : 'gray',
+				});
+
+				group.add(tmprect);
+				group.add(tmptype);
+				group.add(tmpname);
+				group.setX(0);
+				group.setY(0);
+				group.setId(datatype);
+				group.setName("basicvar");
+
+				return group;
+			}
+
+			function emitVar(text) {
+				var arr = text.split('@');
+				var name = arr[0];
+				var value = arr[1];
+				// 				name
+				tmp.children[1].setText(name);
+
+				// tmp.children[1].transitionTo({
+				// duration : 1,
+				// easing : 'bounce-ease-out',
+				// });
+
+				// 				value
+				tmp.children[0].setText("\n" + value);
+
+				mainlayer.draw();
+			}
+
+			function deleteVar() {
+				// 				name
+				tmp.children[1].setText("");
+				// 				value
+				tmp.children[0].setText("\n");
+
+				mainlayer.draw();
+			}
+
+			function connNode() {
+				var fromObj = tmp.children[0];
+				var toObj = tmp2.children[0];
+
+				var fromObjX = fromObj.getAbsolutePosition().x;
+				var fromObjY = fromObj.getAbsolutePosition().y;
+				var toObjX = toObj.getAbsolutePosition().x;
+				var toObjY = toObj.getAbsolutePosition().y;
+				var fromObjW = fromObj.getWidth();
+				var fromObjH = fromObj.getHeight();
+				var toObjW = toObj.getWidth();
+				var toObjH = toObj.getHeight();
+
+				var line = new Kinetic.Shape({
+					drawFunc : function(context) {
+						var fromX = fromObjX + fromObjW / 2;
+						var fromY = fromObjY + fromObjH / 2;
+						var toX = toObjX + toObjW / 2;
+						var toY = toObjY + toObjH / 2;
+
+						context.beginPath();
+						context.moveTo(fromX, fromY);
+						context.lineTo(toX, toY);
+						context.moveTo(fromX, toY);
+						context.closePath();
+						this.fill(context);
+						this.stroke(context);
+					},
+					stroke : "#948E9E",
+					strokeWidth : 3
+				});
+				
+				line.moveToBottom();
+
+				// line.transitionTo({
+				// x : fromObjW,
+				// scale : {
+				// x : 1,
+				// y : 1
+				// },
+				// duration : 1,
+				// easing : 'ease-out'
+				// });
+
+				mainlayer.add(line);
+				mainlayer.draw();
+			}
+
+		</script>
+	</body>
+</html>

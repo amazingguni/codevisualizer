@@ -1,0 +1,120 @@
+<html>
+	<body>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+		<script src="http://yandex.st/raphael/2.0/raphael.min.js"></script>
+		<script src="testspringy.js"></script>
+		<script>
+			Raphael.fn.label = function(str) {
+
+				var color = Raphael.getColor();
+
+				this.setStart();
+
+				var shape = this.rect(0, 0, 60, 30, 10);
+				shape.attr({
+					fill : color,
+					stroke : color,
+					"fill-opacity" : 0,
+					"stroke-width" : 2,
+					cursor : "move"
+				}).setOffset();
+
+				var text = this.text(30, 15, str).attr({
+					'font-size' : 15
+				}).setOffset();
+
+				return this.setFinish();
+
+			}
+
+			Raphael.el.setOffset = function() {
+				this.offsetx = this.attr('x');
+				this.offsety = this.attr('y');
+			}
+			function moveSet(set, x, y) {
+				set.forEach(function(item) {
+					item.attr({
+						x : x + item.offsetx,
+						y : y + item.offsety
+					})
+				});
+			}
+
+			function doit() {
+				var layout = new Layout.ForceDirected(graph, 640, 480.0, 0.5);
+
+				var r = Raphael("holder", 640, 480);
+
+				// calculate bounding box of graph layout.. with ease-in
+				var currentBB = layout.getBoundingBox();
+				var targetBB = {
+					bottomleft : new Vector(-2, -2),
+					topright : new Vector(2, 2)
+				};
+
+				// auto adjusting bounding box
+				Layout.requestAnimationFrame(function adjust() {
+					targetBB = layout.getBoundingBox();
+					// current gets 20% closer to target every iteration
+					currentBB = {
+						bottomleft : currentBB.bottomleft.add(targetBB.bottomleft.subtract(currentBB.bottomleft).divide(10)),
+						topright : currentBB.topright.add(targetBB.topright.subtract(currentBB.topright).divide(10))
+					};
+
+					Layout.requestAnimationFrame(adjust);
+				});
+
+				// convert to/from screen coordinates
+				toScreen = function(p) {
+					var size = currentBB.topright.subtract(currentBB.bottomleft);
+					var sx = p.subtract(currentBB.bottomleft).divide(size.x).x * r.width;
+					var sy = p.subtract(currentBB.bottomleft).divide(size.y).y * r.height;
+					return new Vector(sx, sy);
+				};
+
+				var renderer = new Renderer(layout, function clear() {
+					// code to clear screen
+				}, function drawEdge(edge, p1, p2) {
+					var connection;
+
+					if (!edge.connection) {
+
+						if (!edge.source.shape || !edge.target.shape)
+							return;
+
+						connection = r.connection(edge.source.shape, edge.target.shape, {
+							stroke : edge.data['color']
+						});
+						edge.connection = connection;
+
+					} else {
+						edge.connection.draw();
+					}
+
+				}, function drawNode(node, p) {
+
+					var shape;
+
+					if (!node.shape) {
+						node.shape = r.label("test");
+					}
+					shape = node.shape;
+
+					s = toScreen(p);
+					moveSet(shape, Math.floor(s.x), Math.floor(s.y));
+
+				});
+
+				renderer.start();
+
+			}
+
+			jQuery(function() {
+				doit();
+			});
+		</script>
+
+		<div id="holder" width="640" height="480"></div>
+
+	</body>
+</html>

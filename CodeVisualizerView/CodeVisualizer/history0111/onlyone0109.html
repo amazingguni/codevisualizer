@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="Custom Login Form Styling with CSS3" />
+		<meta name="keywords" content="css3, login, form, custom, input, submit, button, html5, placeholder" />
+		<meta name="author" content="Codrops" />
+
+		<link rel="shortcut icon" href="../favicon.ico">
+		<link rel="stylesheet" href="css/hjmain.css" />
+		<link rel="stylesheet" type="text/css" href="css/style_main.css" />
+
+		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.3.min.js"></script>
+
+		<script src="js/modernizr.custom.63321.js"></script>
+		<!-- 		<script src="js/fullmodule.js"></script> -->
+		<script src="data/data0108.js"></script>
+
+		<title>CodeVisualizer-main</title>
+
+		<style type="text/css">
+			#pic {
+				width: 100%;
+				height: 100%;
+				background-color: #fff
+			}
+		</style>
+	</head>
+	<body>
+		<header class="header">
+			<div class ="nav logo">
+				<img id="logo" src="images/logo.png" />
+			</div>
+			<a>CodeVisualizer</a>
+
+			<div id="memberinfo-content">
+				<a id="memberIcon"></a>
+				<a id="memberid" href="#">hj</a>
+				<a id="logout" href="logout.php"> Sign Out</a>
+			</div>
+		</header>
+
+		<section>
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a id="drawData" class="ico-wrapper" onclick="drawData()">drawData</a>
+					<div id="divider"></div>
+					<a id="preziprev" class="ico-wrapper" onclick="preziprev()">preziprev</a>
+					<div id="divider"></div>
+					<a id="prezinext" class="ico-wrapper" onclick="prezinext()">prezinext</a>
+					<div id="divider"></div>
+					<a id= "testdbg" class="ico-wrapper"></a>
+					<div id="divider"></div>
+					<a id= "pagenumdbg" class="ico-wrapper"></a>
+					<div id="divider"></div>
+					<a id= "dbgcontent" class="ico-wrapper"></a>
+				</div>
+				<!-- Code Visualizer View-->
+				<div id="pic" wrap="soft"></div>
+			</div>
+		</section>
+
+		<!--본격 스크립트-->
+		<script>
+			var alldatas = getAllDataArray();
+			var frameListEOF = "->None";
+
+			var picture = document.getElementById("pic");
+			var picW = picture.offsetWidth;
+			var picH = picture.offsetHeight;
+
+			var testdbg = document.getElementById("testdbg");
+			var pagenumdbg = document.getElementById("pagenumdbg");
+			var dbgcontent = document.getElementById("dbgcontent");
+
+			//stage 생성
+			var stage = createStage(stage, picture);
+			var mainlayer = createLayer("mainlayer");
+			stage.add(mainlayer);
+
+			var datacount = 0;
+
+			// for (var i = 0; i < alldatas.length; i++) {
+			// var tmptostring = objectToString(alldatas[i]);
+			// var tmptoobject = stringToObject(tmptostring);
+			//
+			// var framedict = tmptoobject.FrameDict;
+			// var objdict = tmptoobject.objDict;
+			// var framelist = tmptoobject.FrameList;
+			// var printlist = tmptoobject.printList;
+			//
+			// // framelist로 frame 그리기
+			// for (var j = 0; j < framelist.length; j++) {
+			// createFrame(framelist[j]);
+			// // mainlayer.add(drawframe);
+			// }
+			// }
+
+			// stage.setDraggable(true);
+
+			//stage에 mousewheel event 추가
+			stage.getDOM().addEventListener("DOMMouseScroll", handleScroll, false);
+			stage.getDOM().addEventListener("mousewheel", handleScroll, false);
+			//
+			// var num = 0;
+			var prezinum = 0;
+			//
+			//확대축소 관련
+			var scale = 1.0;
+			var scaleMultiplier = 0.8;
+			var startDragOffset = {};
+			var mouseDown = false;
+			//
+			// //animation 관련
+			// var translatePos = {
+			// x : stage.getWidth() / 2,
+			// y : stage.getHeight() / 2
+			// };
+			//
+			// var cX = stage.getWidth() / 2;
+			// var cY = stage.getHeight() / 2;
+			//
+			// window.alert(getString());
+
+			var click = 0;
+
+			function drawData() {
+				click++;
+
+				if (click == 1) {
+					var predata = allDatas[12];
+
+					var framedict = predata.FrameDict;
+					var objdict = predata.objDict;
+					var framelist = predata.FrameList;
+					var printlist = predata.printList;
+
+					// framelist로 frame 그리기
+					for (var j = 0; j < framelist.length; j++) {
+						if (checkStr(framelist[j], frameListEOF)) {
+							break;
+						}
+						createFrame(framelist[j]);
+					}
+
+					// framedict 내용 그리기
+					for (var childkey in framedict) {( function() {
+								var childData = framedict[childkey];
+								drawSampleDataJson(childData);
+							}());
+
+					}
+
+					mainlayer.draw();
+					testdbg.innerHTML = datacount;
+					// return 0;
+
+				} else if (click == 2) {
+					var nextdata = allDatas[13];
+
+					var framedict = nextdata.FrameDict;
+					var objdict = nextdata.objDict;
+					var framelist = nextdata.FrameList;
+					var printlist = nextdata.printList;
+
+					// framelist로 frame 그리기
+					for (var j = 0; j < framelist.length; j++) {
+						if (checkStr(framelist[j], frameListEOF)) {
+							break;
+						}
+						createFrame(framelist[j]);
+					}
+
+					// framedict 내용 그리기
+					for (var childkey in framedict) {( function() {
+								var childData = framedict[childkey];
+								drawSampleDataJson(childData);
+							}());
+
+					}
+
+					mainlayer.draw();
+					testdbg.innerHTML = datacount;
+
+				} else {
+					var drawDatabtn = document.getElementById("drawData");
+					drawDatabtn.innerHTML = "Don't Click";
+					return -1;
+				}
+			}
+
+			function drawSampleDataJson(datas) {
+				var dataLen = datas.length;
+
+				for (var i = 3; i < dataLen; i++) {
+
+					addVarToFrame(datas[1], datas[i], datas[i + 1], (dataLen - 3) / 2);
+
+					if (checkStr(datas[i + 1], 'instance')) {//instance가 포함되어 있다면
+						window.alert(datas[i + 1]);
+						// drawSampleDataJson(objDatas, null);
+					}
+
+					// parentgr.transitionTo({
+					// y : 0,
+					// duration : 1,
+					// easing : 'ease-out'
+					// });
+					i++;
+				}
+				mainlayer.draw();
+
+				dbgcontent.innerHTML = datas[0] + ":" + datas[1] + ":" + datas[2] + "번째 줄 <br>";
+
+				// if (objDatas == null) {
+				// return;
+				// }
+			}
+
+			function addVarToFrame(framename, datatype, datavalue, num) {
+				var tmpid = "#" + framename;
+				//frame name
+				var stage = mainlayer.getStage();
+				var grouparr = stage.get(tmpid);
+				var groupframe = grouparr[0];
+
+				var childarr = groupframe.get(".basicvar");
+
+				var childlen = childarr.length;
+
+				if (childlen != num) {
+					var childgr = drawBaseVar(datatype, "", datavalue);
+					groupframe.add(setVarsPos(groupframe, childgr));
+					mainlayer.add(groupframe);
+				}
+
+				for (var i = 0; i < childlen; i++) {
+					if (childarr[i].children[1].getText() == datatype) {
+						if (childarr[i].children[0].getText() == "\n" + datavalue) {
+						} else {
+							childarr[i].children[0].setText("\n" + datavalue);
+							mainlayer.draw();
+						}
+					}
+				}
+			}
+
+			// function addVarToFrame(framename, datatype, datavalue) {
+			// var tmpid = "#" + framename;
+			// //frame name
+			// var stage = mainlayer.getStage();
+			// var grouparr = stage.get(tmpid);
+			// var groupframe = grouparr[0];
+			//
+			// var childlen = groupframe.children.length;
+			//
+			// if (childlen == 1) {
+			// var childgr = drawBaseVar(datatype, "", datavalue);
+			// groupframe.add(setVarsPos(groupframe, childgr));
+			// } else {
+			// while (true) {
+			// if (--childlen == 0) {
+			// break;
+			// }
+			//
+			// while (groupframe.children[childlen].children[1].getText() != datatype) {
+			//
+			// }
+			//
+			// if(groupframe.children[childlen].children[1].getText() == datatype) {
+			// var childtype = groupframe.children[childlen].children[1].getText();
+			// var childname = groupframe.children[childlen].children[0].getText();
+			//
+			// if (childname == "\n" + datavalue) {
+			// } else {
+			// groupframe.children[childlen].children[0].setText("\n" + datavalue);
+			// groupframe.children[childlen].children[0].draw();
+			// }
+			// }
+			// }
+			// if (groupframe.children[childlen].children[1].getText() != datatype) {
+			// var childgr = drawBaseVar(datatype, "", datavalue);
+			// groupframe.add(setVarsPos(groupframe, childgr));
+			// }
+			// }
+			//
+			// return groupframe;
+			// }
+
+			function setVarsPos(parent, childgroup) {
+				var width = parent.children[0].getWidth();
+				var height = parent.children[0].getHeight();
+				childgroup.setDraggable(true);
+
+				childgroup.setX(parent.children[0].getX() + customRand(width));
+				childgroup.setY(parent.children[0].getY() + customRand(height));
+
+				return childgroup;
+			}
+
+			function customRand(range) {
+				var a = 1664525;
+				var m = 4294967296;
+				var c = 1013904223;
+
+				var offset = 0;
+
+				var x = Math.round(Math.random() * range);
+
+				var tmp = (a * x + c) % m;
+
+				var res = tmp % range + offset;
+
+				return res;
+			}
+
+			//변수 그림 그리는 함수
+			function drawBaseVar(datatype, dataname, datavalue) {
+				// var wholegroup = new Kinetic.Group();
+
+				var r = Math.random();
+				var orivalue = "";
+				var group = new Kinetic.Group();
+				group.setDraggable(true);
+
+				orivalue = datavalue;
+
+				if (datavalue.length > 8) {
+					datavalue = datavalue.substring(0, 8) + "...";
+				}
+
+				var tmprect = new Kinetic.Text({
+					x : 0,
+					y : 0,
+					name : orivalue,
+					stroke : 'white',
+					strokeWidth : 0,
+					draggable : true,
+					fill : "rgb(" + parseInt(255 * r) + ",160,200)",
+					text : "\n" + datavalue,
+					fontSize : 30,
+					fontFamily : 'Calibri',
+					textFill : 'white',
+					width : 200,
+					height : 100,
+					align : 'center',
+					shadow : {
+						offset : 2,
+						color : 'black',
+						blur : 3,
+						opacity : 0.1
+					},
+					cornerRadius : 5,
+				});
+
+				var tw = tmprect.getWidth();
+				var th = tmprect.getHeight();
+
+				var tmptype = new Kinetic.Text({
+					y : -23,
+					width : tw,
+					align : 'left',
+					text : datatype,
+					fontSize : 18,
+					textFill : 'gray',
+				});
+
+				var tmpname = new Kinetic.Text({
+					y : th + 6,
+					x : 0,
+					width : tw,
+					text : dataname,
+					align : 'right',
+					fontSize : 15,
+					textFill : 'gray',
+				});
+
+				group.add(tmprect);
+				group.add(tmptype);
+				group.add(tmpname);
+				// customRand(screen.height)
+				group.setX(0);
+				group.setY(0);
+				group.setScale(0.7);
+				group.setName("basicvar");
+
+				//animation 어쩌지...
+				// tmprect.transitionTo({
+				// x : 0,
+				// scale : {
+				// x : 1,
+				// y : 1
+				// },
+				// duration : 1,
+				// easing : 'ease-out'
+				// });
+
+				// wholegroup.add(group);
+
+				return group;
+			}
+
+			//확대 축소
+			function handleScroll(evt) {
+				var delta = evt.wheelDelta ? evt.wheelDelta / 40 : evt.detail ? -evt.detail : 0;
+				if (delta > 0) {
+					scale /= scaleMultiplier;
+					mainlayer.setScale(scale);
+					mainlayer.draw();
+				} else {
+					scale *= scaleMultiplier;
+					mainlayer.setScale(scale);
+					mainlayer.draw();
+				}
+				return evt.preventDefault() && false;
+			};
+
+			// 			framelist : 현재 FrameList
+			function createFrame(frameid) {
+				var tmpid = "#" + frameid;
+				var stage = mainlayer.getStage();
+				var grouparr = stage.get(tmpid);
+				var groupframe = grouparr[0];
+
+				if (groupframe == undefined || groupframe == null || groupframe == '' || groupframe == 'undefined' || groupframe == 'null') {
+					tmpgroup = createGroup(frameid);
+					tmpgroup.setAbsolutePosition(0, -picH * mainlayer.children.length);
+
+					var tmpFrameName = new Kinetic.Text({
+						x : 0,
+						y : 0,
+						width : picW,
+						height : picH,
+						fill : "#eee", //frame 구분하기 위한 색상
+						align : 'left',
+						text : frameid,
+						fontSize : 20,
+						textFill : 'gray',
+					});
+
+					tmpgroup.add(tmpFrameName);
+					tmpgroup.setDraggable(true);
+					mainlayer.add(tmpgroup);
+					return tmpgroup;
+				} else {
+					return groupframe;
+				}
+			}
+
+			function createStage(stage, canvas) {
+				var picW = canvas.offsetWidth;
+				var picH = canvas.offsetHeight - 20;
+
+				if (stage == null) {
+					var stage = new Kinetic.Stage({
+						container : canvas,
+						width : picW,
+						height : picH
+					});
+					return stage;
+				} else {
+					return stage;
+				}
+			}
+
+			function createLayer(layerid) {
+				var layer = new Kinetic.Layer();
+				layer.setId(layerid);
+				return layer;
+			}
+
+			function createGroup(groupid) {
+				var group = new Kinetic.Group();
+				group.setId(groupid);
+				return group;
+			}
+
+			//문자열에 포함되어 있는지 check
+			function checkStr(strdata, substr) {
+				var pattern = new RegExp(substr, "g");
+
+				if (pattern.exec(strdata)) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+
+			function preziprev() {
+				if (prezinum == 0) {
+					return;
+				}
+				mainlayer.transitionTo({
+					y : (picH * --prezinum),
+					scale : {
+						x : 1,
+						y : 1
+					},
+					duration : 1.2,
+					easing : 'ease-out'
+				});
+
+				mainlayer.draw();
+				pagenumdbg.innerHTML = (prezinum + 1) + "페이지";
+			}
+
+			function prezinext() {
+				if (prezinum == mainlayer.children.length - 1) {
+					return;
+				}
+				mainlayer.transitionTo({
+					y : (picH * ++prezinum),
+					scale : {
+						x : 1,
+						y : 1
+					},
+					duration : 1.2,
+					easing : 'ease-out'
+				});
+
+				mainlayer.draw();
+				pagenumdbg.innerHTML = (prezinum + 1) + "페이지";
+			}
+
+		</script>
+	</body>
+</html>

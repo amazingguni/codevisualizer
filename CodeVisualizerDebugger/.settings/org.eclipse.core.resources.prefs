@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//src/DebuggerModule/Python/pydb/complete.py=utf-8
+encoding//src/DebuggerModule/Python/pydb/connection.py=utf-8
+encoding//src/DebuggerModule/Python/pydb/display.py=utf-8
+encoding//src/DebuggerModule/Python/pydb/sighandler.py=utf-8

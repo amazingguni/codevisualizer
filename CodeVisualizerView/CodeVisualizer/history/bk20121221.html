@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Code Visualizer</title>
+		<link rel="stylesheet" href="css/main.css" />
+		<script src="js/jquery-1.8.2.min.js"></script>
+		<script src="js/jquery-ui-1.8.23.custom.min.js"></script>
+		<script src="js/jquery.css3.min.js"></script>
+		<script src="js/jquery.easing.js"></script>
+		<script src="js/jquery.hoverIntent.min.js"></script>
+
+		<script src="js/system.js"></script>
+		<script src="js/sidebars.js"></script>
+		<script src="js/modal.js"></script>
+		<script src="ace-editor/ace.js" type="text/javascript" charset="UTF-8"></script>
+		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.3.min.js"></script>
+
+		<script src="js/mainmodule.js"></script>
+		<script src="data/dataobjclass.js"></script>
+		<script src="data/rowdataclass.js"></script>
+	</head>
+
+	<body>
+		<!--header-->
+		<header>
+			<img id="logoimg" src="img/logo.png"/>
+		</header>
+
+		<section>
+			<!--왼쪽사이드-->
+			<div id="sb-left" class="sidebar" >
+				<!--프로젝트 네비게이션 -->
+				<div class="sb-left-content">
+					<span id="filenavi">File Navigation</span>
+					<br>
+					<br>
+					<br>
+
+					<!--프로젝트리스트 -->
+					<ul id="filemenu">
+						<li>
+							FirstPython.py
+						</li>
+						<br>
+						<li>
+							SecondPython.py
+						</li>
+						<br>
+						<li>
+							ThirdPython.py
+						</li>
+						<br>
+						<li>
+							FourthPython.py
+						</li>
+						<br>
+						<li>
+							FifthPython.py
+						</li>
+						<br>
+						<li>
+							SixthPython.py
+						</li>
+						<br>
+						<li id="debugging">
+							SeventhPython.py
+						</li>
+					</ul>
+				</div>
+
+				<!--손잡이 -->
+				<div class="sidebar-handle">
+					<span>::</span>
+
+				</div>
+			</div>
+
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a id="login" class="ico-wrapper">Login</a>
+					<div id="divider"></div>
+					<a id="join" class="ico-wrapper">Join</a>
+					<div id="divider"></div>
+					<a id="init" class="ico-wrapper" onclick="init()">canvasInit</a>
+					<div id="divider"></div>
+					<a id="send" class="ico-wrapper" onclick="coviSend()">Send</a>
+					<div id="divider"></div>
+					<a id="run" class="ico-wrapper" onclick="coviRun()">Run</a>
+					<div id="divider"></div>
+					<a id="next" class="ico-wrapper" onclick="coviNext()">Next</a>
+					<div id="divider"></div>
+					<a id="step" class="ico-wrapper" onclick="coviStep()">Step</a>
+					<div id="divider"></div>
+					<a id="continue" class="ico-wrapper" onclick="coviContinue()">Continue</a>
+					<div id="divider"></div>
+					<a id="quit" class="ico-wrapper" onclick="coviQuit()">Quit</a>
+					<div id="divider"></div>
+					<a id="group" class="ico-wrapper" onclick="coviGroup(stage)">Group</a>
+					<div id="divider"></div>
+					<a id="ungroup" class="ico-wrapper" onclick="coviUngroup(stage)">Ungroup</a>
+					<div id="divider"></div>
+					<a id="erase" class="ico-wrapper" onclick="coviErase(stage, 'abc')">Erase</a>
+					<div id="divider"></div>
+				</div>
+
+				<!-- 편집기 -->
+				<div id ="editview" onkeydown="sendCode(event)"></div>
+
+				<!-- Code Visualizer View-->
+				<div id="picture" wrap="soft"></div>
+
+				<!-- console View-->
+				<textarea id="result" wrap="soft"></textarea>
+			</div>
+
+			<!--팝업창-->
+			<div id="modal-overlay" align="center"></div>
+			<div id="modal" align="center">
+				<div id="modal-content" align="center"></div>
+			</div>
+
+		</section>
+
+		<!--본격 스크립트-->
+		<script>
+			//편집기
+			var editview = document.getElementById("editview");
+			//code visualizer view
+			var picture = document.getElementById("picture");
+			//console view
+			var result = document.getElementById("result");
+			//dbg 용
+			var dbg = document.getElementById("debugging");
+
+			//breakpoint 관련 class
+			var breakrowclass = new DataObj(null, new Array());
+
+			//pic size
+			var picW = picture.offsetWidth;
+			var picH = picture.offsetHeight;
+
+			//ace-editor : monokai 테마, python언어
+			var editor = ace.edit("editview");
+			editor.setTheme("ace/theme/monokai");
+			editor.getSession().setMode("ace/mode/python");
+
+			//stage 생성
+			var stage = createStage(stage, picture);
+			var mainlayer = createLayer("mainlayer");
+
+			stage.add(mainlayer);
+
+			stage.setDraggable(true);
+
+			//stage에 mousewheel event 추가
+			stage.getDOM().addEventListener("DOMMouseScroll", handleScroll, false);
+			stage.getDOM().addEventListener("mousewheel", handleScroll, false);
+
+			//tooltip layer 생성
+			var tooltipLayer = createLayer("tooltip");
+
+			//tooltip
+			var tooltip = new Kinetic.Text({
+				text : "",
+				fontFamily : "Calibri",
+				fontSize : 12,
+				padding : 5,
+				textFill : "white",
+				fill : "black",
+				alpha : 0.5,
+				visible : false
+			});
+
+			tooltipLayer.add(tooltip);
+			stage.add(tooltipLayer);
+
+			//확대축소 관련
+			var scale = 1.0;
+			var scaleMultiplier = 0.8;
+			var startDragOffset = {};
+			var mouseDown = false;
+
+			//animation 관련
+			var translatePos = {
+				x : stage.getWidth() / 2,
+				y : stage.getHeight() / 2
+			};
+
+			//편집기의 str값이 변할때 마다 작동
+			editor.getSession().on('change', function(e) {
+				result.innerHTML = getAllLinesStr();
+			});
+
+			//breakpoint 걸 때
+			editor.on("gutterclick", function(e) {
+				var target = e.domEvent.target;
+				if (target.className.indexOf("ace_gutter-cell") == -1)
+					return;
+				if (!editor.isFocused())
+					return;
+				if (e.clientX > 25 + target.getBoundingClientRect().left)
+					return;
+
+				var row = e.getDocumentPosition().row;
+				breakrowclass.pushRow(row);
+				dbg.innerHTML = breakrowclass.getBreakpointrow();
+				e.editor.session.setBreakpoint(row);
+				e.stop();
+			});
+
+			//breakpoint 풀 때
+			editor.on("guttermousedown", function(e) {
+				var target = e.domEvent.target;
+				if (target.className.indexOf("ace_gutter-cell") == -1)
+					return;
+				if (!editor.isFocused())
+					return;
+				if (e.clientX > 25 + target.getBoundingClientRect().left)
+					return;
+
+				var row = e.getDocumentPosition().row;
+				var breakarray = e.editor.session.getBreakpoints();
+
+				if (breakarray != null) {
+					for (var i = 0; i < breakarray.length; i++) {
+						if ("ace_breakpoint" == breakarray[i]) {
+							if (row == i) {
+								breakrowclass.delByIndex(row);
+								dbg.innerHTML = breakrowclass.getBreakpointrow();
+								e.editor.session.clearBreakpoint(row);
+								e.stop();
+							}
+						}
+					}
+
+				}
+			});
+
+			//tool
+			stage.on('mouseover mousemove dragmove', function(evt) {
+				var node = evt.shape;
+				// update tooltip
+				var mousePos = node.getStage().getMousePosition();
+				tooltip.setPosition(mousePos.x + 2, mousePos.y + 2);
+				tooltip.setText(node.getName());
+				tooltip.show();
+				tooltipLayer.draw();
+			});
+
+			stage.on('mouseout', function(evt) {
+				tooltip.hide();
+				tooltipLayer.draw();
+			});
+
+			var cX = stage.getWidth() / 2;
+			var cY = stage.getHeight() / 2;
+
+			// mainlayer.on('click', function(evt) {
+			// var cvsPos = getPos(picture);
+			//
+			// var R = {//(canvas space)
+			// x : evt.pageX,
+			// y : evt.pageY
+			// };
+			//
+			// var mousePosition = evt.shape.getStage().getMousePosition();
+			//
+			// var thisPos = this.getPosition();
+			// var w = stage.getWidth();
+			// var h = stage.getHeight();
+			//
+			// var scl = this.getScale().x;
+			//
+			// var centerPos = {
+			// x : w / 2,
+			// y : h / 2
+			// }
+			//
+			// // mousePos == xA
+			// var xA = {
+			// x : (R.x - thisPos.x - cvsPos.x) / scl,
+			// y : (R.y - thisPos.y - cvsPos.y) / scl
+			// }
+			//
+			// var newPos = {
+			// x : centerPos.x - scl * xA.x,
+			// y : centerPos.y - scl * xA.y
+			// }
+			//
+			// this.transitionTo({
+			// x : newPos.x,
+			// y : newPos.y,
+			// scale : {
+			// x : 3,
+			// y : 3
+			// },
+			// duration : 1,
+			// easing : 'ease-out',
+			// });
+			//
+			// this.draw();
+			//
+			// // var cvsPosdbg = "cvsPos : " + cvsPos.x + " , " + cvsPos.y + "\n";
+			// // var thisposdbg = "getCenterPos : " + getCenterPos(evt.shape).x + " , " + getCenterPos(evt.shape).y + "\n";
+			// // var thisdbg = "thisPos : " + thisPos.x + " , " + thisPos.y + "\n";
+			// // var centerposdbg = "centerPos : " + centerPos.x + " , " + centerPos.y + "\n";
+			// // var mouseposdbg = "mousePos : " + mousePosition.x + " , " + mousePosition.y + "\n";
+			// // var Rdbg = "R : " + R.x + " , " + R.y + "\n";
+			// // var xAdbg = "xA : " + xA.x + " , " + xA.y + "\n";
+			// // var newPosdbg = "newPos : " + newPos.x + " , " + newPos.y + "\n";
+			// //
+			// // stagedbg.innerHTML = cvsPosdbg + thisposdbg + thisdbg + centerposdbg + mouseposdbg + Rdbg + xAdbg + newPosdbg;
+			//
+			// });
+
+			mainlayer.on('click', function(evt) {
+				var node = evt.shape;
+
+				if (node.getParent().getId() != null) {
+					cameraView(this, evt, 1);
+				} else {
+					cameraView(this, evt, 2);
+				}
+
+				mainlayer.draw();
+			});
+
+			// mainlayer.on('click', function(evt) {
+			// var cvsPos = getPos(picture);
+			//
+			// var R = {//(canvas space)
+			// x : evt.pageX,
+			// y : evt.pageY
+			// };
+			//
+			// var thisPos = this.getPosition();
+			// var w = stage.getWidth();
+			// var h = stage.getHeight();
+			//
+			// var scl = this.getScale().x;
+			//
+			// var centerPos = {
+			// x : w / 2,
+			// y : h / 2
+			// }
+			//
+			// var xA = {
+			// x : (R.x - thisPos.x - cvsPos.x) / scl,
+			// y : (R.y - thisPos.y - cvsPos.y) / scl
+			// }
+			//
+			// var newPos = {
+			// x : centerPos.x - scl * xA.x,
+			// y : centerPos.y - scl * xA.y
+			// }
+			//
+			// this.transitionTo({
+			// x : newPos.x,
+			// y : newPos.y,
+			// scale : {
+			// x : 2,
+			// y : 2
+			// },
+			// duration : 1,
+			// easing : 'ease-out',
+			// });
+			//
+			// this.draw();
+			//
+			// });
+
+			// mainlayer.on('click', function(evt) {
+			// var node = evt.shape;
+			// var tmp = node.getParent();
+			//
+			// var tmpAbsPos = tmp.getAbsolutePosition();
+			// var tmpPos = tmp.getPosition();
+			//
+			// var R = {
+			// x : evt.pageX,
+			// y : evt.pageY
+			// };
+			//
+			// var w = stage.getWidth();
+			// var h = stage.getHeight();
+			//
+			// var centerPos = {
+			// x : w / 2,
+			// y : h / 2
+			// }
+			//
+			// var newPos = {
+			// x : tmpAbsPos.x,
+			// y : tmpAbsPos.x
+			// }
+			//
+			// // this.transitionTo({
+			// // x : newPos.x,
+			// // y : newPos.y,
+			// // scale : {
+			// // x : 1,
+			// // y : 1
+			// // },
+			// // duration : 1,
+			// // easing : 'ease-out',
+			// // });
+			//
+			// this.setPosition(newPos);
+			//
+			// this.draw();
+			// });
+
+			// mainlayer.on('click', function(evt) {
+			// var clickobj = evt.shape;
+			// var tmp = clickobj.getParent();
+			//
+			// var cnvsPos = getPos(picture);
+			//
+			// var R = {//(canvas space)
+			// x : evt.pageX,
+			// y : evt.pageY
+			// };
+			//
+			// var off0 = this.getPosition();
+			// var scl0 = this.getScale().x;
+			// var w = stage.getWidth();
+			// var h = stage.getHeight();
+			//
+			// //desired zoom point (e.g. mouse position, canvas center)
+			// var zP = {
+			// //use these first two lines to center the image on the clicked point while zooming
+			// x : w / 2,
+			// y : h / 2
+			//
+			// //use these next two lines to zoom the image around the clicked point
+			// // x : R.x - cnvsPos.x,
+			// // y : R.y - cnvsPos.y
+			//
+			// }
+			//
+			// //actual pixel value clicked (image space)
+			// var xA = {
+			// x : (R.x - off0.x - cnvsPos.x) / scl0,
+			// y : (R.y - off0.y - cnvsPos.y) / scl0
+			// }
+			//
+			// //rescale image
+			// var sclf = scl0 * 1.10;
+			// this.setScale(sclf);
+			//
+			// //move clicked pixel to the desired zoom point
+			// var newR = {
+			// x : zP.x - sclf * xA.x,
+			// y : zP.y - sclf * xA.y
+			// }
+			//
+			// this.setPosition(newR.x, newR.y)
+			//
+			// this.draw();
+			//
+			// });
+
+			// mainlayer.on('click', function(evt) {
+			// var cvsPos = getPos(picture);
+			//
+			// var node = evt.shape;
+			// var tmp = node.getParent();
+			//
+			// // var R = {
+			// // x : evt.pageX,
+			// // y : evt.pageY
+			// // };
+			//
+			// var R = {
+			// x : evt.pageX,
+			// y : evt.pageY
+			// };
+			//
+			// var thisPos = this.getPosition();
+			// var w = stage.getWidth();
+			// var h = stage.getHeight();
+			//
+			// var centerPos = {
+			// x : w / 2,
+			// y : h / 2
+			// }
+			//
+			// var xA = {
+			// x : (R.x - thisPos.x - cvsPos.x),
+			// y : (R.y - thisPos.y - cvsPos.y)
+			// }
+			//
+			// var newPos = {
+			// x : centerPos.x - xA.x,
+			// y : centerPos.y - xA.y
+			// }
+			//
+			// this.transitionTo({
+			// x : newPos.x,
+			// y : newPos.y,
+			// scale : {
+			// x : 1,
+			// y : 1
+			// },
+			// duration : 1,
+			// easing : 'ease-out',
+			// });
+			//
+			// this.draw();
+			// });
+
+			//enter 쳤을 때의 처리
+			function sendCode(e) {
+				if (e) {
+					e = e;
+				} else {
+					e = window.event;
+				}
+
+				if (e.which) {
+					var keycode = e.which;
+				} else {
+					var keycode = e.keyCode;
+				}
+
+				if (keycode == 13) {
+					var cursor = editor.getCursorPosition();
+					var currow = cursor.row;
+					var curLine = editor.session.getLine(currow);
+
+					var rowdata = new rowData(currow, curLine);
+					var curLen = rowdata.getRowlen();
+
+					var arr = rowdata.getSplitToken('@');
+
+					// drawFunction(null, "mainFunc", arr[0], arr[1], arr[2]);
+					addVarToClass(stage, mainlayer, arr);
+				}
+			}
+		</script>
+	</body>
+</html>

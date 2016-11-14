@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Code Visualizer</title>
+		<link rel="stylesheet" href="css/main.css" />
+		<script src="js/jquery-1.8.2.min.js"></script>
+		<script src="js/jquery-ui-1.8.23.custom.min.js"></script>
+		<script src="js/jquery.css3.min.js"></script>
+		<script src="js/jquery.easing.js"></script>
+		<script src="js/jquery.hoverIntent.min.js"></script>
+
+		<script src="js/system.js"></script>
+		<script src="js/sidebars.js"></script>
+		<script src="js/modal.js"></script>
+		<script src="ace-editor/ace.js" type="text/javascript" charset="UTF-8"></script>
+		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.3.min.js"></script>
+
+		<script src="js/mainmodule.js"></script>
+		<script src="js/websocket.js"></script>
+
+		<script src="data/dataobjclass.js"></script>
+		<script src="data/builtvardata.js"></script>
+
+		<script src="class/rowdataclass.js"></script>
+		<script src="class/fileinfoclass.js"></script>
+		<script src="class/folderinfoclass.js"></script>
+		<script src="class/rundebugclass.js"></script>
+	</head>
+
+	<body>
+		<!--header-->
+		<header>
+			<img id="logoimg" src="img/logo.png"/>
+		</header>
+
+		<section>
+			<!--왼쪽사이드-->
+			<div id="sb-left" class="sidebar" >
+				<!--프로젝트 네비게이션 -->
+				<div class="sb-left-content">
+					<span id="filenavi">File Navigation</span>
+					<br>
+					<br>
+					<br>
+
+					<!--프로젝트리스트 -->
+					<ul id="filemenu">
+						<li>
+							FirstPython.py
+						</li>
+						<br>
+						<li>
+							SecondPython.py
+						</li>
+						<br>
+						<li>
+							ThirdPython.py
+						</li>
+						<br>
+						<li>
+							FourthPython.py
+						</li>
+						<br>
+						<li>
+							FifthPython.py
+						</li>
+						<br>
+						<li>
+							SixthPython.py
+						</li>
+						<br>
+						<li id="debugging">
+							SeventhPython.py
+						</li>
+					</ul>
+				</div>
+
+				<!--손잡이 -->
+				<div class="sidebar-handle">
+					<span>::</span>
+
+				</div>
+			</div>
+
+			<!--본문 - edit view + codevisualizer view + console view-->
+			<div id="editor-region">
+				<!-- 메뉴 네비게이션-->
+				<div id="editor-top-bar">
+					<a id="makeFile" class="ico-wrapper">makeFile</a>
+					<div id="divider"></div>
+					<a id="makeFolder" class="ico-wrapper">makeFolder</a>
+					<div id="divider"></div>
+					<a id="compileRun" class="ico-wrapper">compileRun</a>
+					<div id="divider"></div>
+					<a id="debugRun" class="ico-wrapper">debugRun</a>
+					<div id="divider"></div>
+
+					<a id="login" class="ico-wrapper">Login</a>
+					<div id="divider"></div>
+					<a id="join" class="ico-wrapper">Join</a>
+					<div id="divider"></div>
+
+					<a id="next" class="ico-wrapper" onclick="coviNext()">Next</a>
+					<div id="divider"></div>
+					<a id="step" class="ico-wrapper" onclick="coviStep()">Step</a>
+					<div id="divider"></div>
+					<a id="continue" class="ico-wrapper" onclick="coviContinue()">Continue</a>
+					<div id="divider"></div>
+					<a id="quit" class="ico-wrapper" onclick="coviQuit()">Quit</a>
+					<div id="divider"></div>
+
+					<a id="group" class="ico-wrapper" onclick="coviGroup(stage)">Group</a>
+					<div id="divider"></div>
+					<a id="ungroup" class="ico-wrapper" onclick="coviUngroup(stage)">Ungroup</a>
+					<div id="divider"></div>
+					<a id="erase" class="ico-wrapper" onclick="coviErase(stage, 'abc')">Erase</a>
+					<div id="divider"></div>
+				</div>
+
+				<!-- 편집기 -->
+				<div id ="editview" onkeydown="enterCode(event)"></div>
+
+				<!-- Code Visualizer View-->
+				<div id="picture" wrap="soft"></div>
+
+				<!-- console View-->
+				<textarea id="result" wrap="soft"></textarea>
+			</div>
+
+			<!--팝업창-->
+			<div id="modal-overlay" align="center"></div>
+			<div id="modal" align="center">
+				<div id="modal-content" align="center"></div>
+			</div>
+
+		</section>
+
+		<!--본격 스크립트-->
+		<script>
+			//편집기
+			var editview = document.getElementById("editview");
+			//code visualizer view
+			var picture = document.getElementById("picture");
+			//console view
+			var result = document.getElementById("result");
+			//dbg 용
+			var dbg = document.getElementById("debugging");
+
+			// json
+			var builtdata = getBuiltData();
+			var tmpdata = new Array();
+
+			var j = 0;
+			for (var key in builtdata) {( function() {
+						//alert(key);
+						tmpdata[j] = builtdata[key];
+						j++;
+					}());
+			}
+
+			//breakpoint 관련 class
+			var breakrowclass = new DataObj(null, new Array());
+
+			//pic size
+			var picW = picture.offsetWidth;
+			var picH = picture.offsetHeight;
+
+			//ace-editor : monokai 테마, python언어
+			var editor = ace.edit("editview");
+			editor.setTheme("ace/theme/monokai");
+			editor.getSession().setMode("ace/mode/python");
+
+			//stage 생성
+			var stage = createStage(stage, picture);
+			var mainlayer = createLayer("mainlayer");
+
+			stage.add(mainlayer);
+
+			stage.setDraggable(true);
+
+			//stage에 mousewheel event 추가
+			stage.getDOM().addEventListener("DOMMouseScroll", handleScroll, false);
+			stage.getDOM().addEventListener("mousewheel", handleScroll, false);
+
+			// //tooltip layer 생성
+			// var tooltipLayer = createLayer("tooltip");
+			//
+			// //tooltip
+			// var tooltip = new Kinetic.Text({
+			// text : "",
+			// fontFamily : "Calibri",
+			// fontSize : 12,
+			// padding : 5,
+			// textFill : "white",
+			// fill : "black",
+			// alpha : 0.5,
+			// visible : false
+			// });
+			//
+			// tooltipLayer.add(tooltip);
+			// stage.add(tooltipLayer);
+
+			var transition2 = {
+				x : 500,
+				duration : 1,
+				callback : function() {
+					console.log('complete 100');
+				}
+			};
+
+			//확대축소 관련
+			var scale = 1.0;
+			var scaleMultiplier = 0.8;
+			var startDragOffset = {};
+			var mouseDown = false;
+
+			//animation 관련
+			var translatePos = {
+				x : stage.getWidth() / 2,
+				y : stage.getHeight() / 2
+			};
+
+			//편집기의 str값이 변할때 마다 작동
+			editor.getSession().on('change', function(e) {
+				result.innerHTML = getAllLinesStr();
+			});
+
+			//breakpoint 걸 때
+			editor.on("gutterclick", function(e) {
+				var target = e.domEvent.target;
+				// 				file name : ace_gutter-cell?
+				if (target.className.indexOf("ace_gutter-cell") == -1)
+					return;
+				if (!editor.isFocused())
+					return;
+				if (e.clientX > 25 + target.getBoundingClientRect().left)
+					return;
+
+				var row = e.getDocumentPosition().row;
+				breakrowclass.pushRow(row);
+				dbg.innerHTML = breakrowclass.getBreakpointrow();
+				e.editor.session.setBreakpoint(row);
+				e.stop();
+			});
+
+			//breakpoint 풀 때
+			editor.on("guttermousedown", function(e) {
+				var target = e.domEvent.target;
+				if (target.className.indexOf("ace_gutter-cell") == -1)
+					return;
+				if (!editor.isFocused())
+					return;
+				if (e.clientX > 25 + target.getBoundingClientRect().left)
+					return;
+
+				var row = e.getDocumentPosition().row;
+				var breakarray = e.editor.session.getBreakpoints();
+
+				if (breakarray != null) {
+					for (var i = 0; i < breakarray.length; i++) {
+						if ("ace_breakpoint" == breakarray[i]) {
+							if (row == i) {
+								breakrowclass.delByIndex(row);
+								dbg.innerHTML = breakrowclass.getBreakpointrow();
+								e.editor.session.clearBreakpoint(row);
+								e.stop();
+							}
+						}
+					}
+
+				}
+			});
+
+			// //tool
+			// stage.on('mouseover mousemove dragmove', function(evt) {
+			// var node = evt.shape;
+			// // update tooltip
+			// var mousePos = node.getStage().getMousePosition();
+			// tooltip.setPosition(mousePos.x + 2, mousePos.y + 2);
+			// tooltip.setText(node.getName());
+			// tooltip.show();
+			// tooltipLayer.draw();
+			// });
+			//
+			// stage.on('mouseout', function(evt) {
+			// tooltip.hide();
+			// tooltipLayer.draw();
+			// });
+
+			var cX = stage.getWidth() / 2;
+			var cY = stage.getHeight() / 2;
+
+			mainlayer.on('click', function(evt) {
+				var node = evt.shape;
+
+				if (node.getParent().getId() != null) {
+					cameraView(this, evt, 1);
+				} else {
+					cameraView(this, evt, 2);
+				}
+
+				mainlayer.draw();
+			});
+
+			//enter 쳤을 때의 처리
+			function enterCode(e) {
+				if (e) {
+					e = e;
+				} else {
+					e = window.event;
+				}
+
+				if (e.which) {
+					var keycode = e.which;
+				} else {
+					var keycode = e.keyCode;
+				}
+
+				if (keycode == 13) {
+					// // 입력
+					var cursor = editor.getCursorPosition();
+					var currow = cursor.row;
+					var curLine = editor.session.getLine(currow);
+					
+					var rowdata = new rowData(currow, curLine);
+					var curLen = rowdata.getRowlen();
+					
+					var arr = rowdata.getSplitToken('@');
+					//
+					// //입력 양식 built: framename@built@num
+					// // 입력 양식 basic : framename@basic@type@name@value
+					// addVarToClass(mainlayer, arr);
+
+					// json방식
+					for (var key in tmpdata) {( function() {
+								//alert(key);
+								var data = tmpdata[key];
+								var tmp = addVarToClassJson(mainlayer, data);
+								
+								// setDrawPos(tmp, arr[0], arr[1]);
+							}());
+					}
+
+				}
+
+			}
+			
+			// function setDrawPos(node, x, y) {
+				// node.setX(x);
+				// node.setY(y);
+// 				
+				// node.draw();			  
+			// }
+		</script>
+	</body>
+</html>
